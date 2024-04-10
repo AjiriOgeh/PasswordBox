@@ -54,6 +54,15 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/EditLoginInfo")
+    public ResponseEntity<?> editLoginInfo(@RequestBody EditLoginInfoRequest editLoginInfoRequest) {
+        try {
+            return new ResponseEntity<>(new ApiResponse(true, userService.editLoginInfo(editLoginInfoRequest)), HttpStatus.OK);
+        } catch (Exception error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/ViewLoginInfo")
     public ResponseEntity<?> viewLoginInfo(@RequestBody ViewLoginInfoRequest viewLoginInfoRequest) {
         try {
@@ -84,6 +93,16 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/EditNote")
+    public ResponseEntity<?> editNote(@RequestBody EditNoteRequest editNoteRequest) {
+        try {
+            return new ResponseEntity<>(new ApiResponse(true, userService.editNote(editNoteRequest)), HttpStatus.OK);
+        }
+        catch (Exception error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/ViewNote")
     public ResponseEntity<?> viewNote(@RequestBody ViewNoteRequest viewNoteRequest) {
         try {
@@ -100,6 +119,25 @@ public class UserController {
             return new ResponseEntity<>(new ApiResponse(true, userService.deleteNote(deleteNoteRequest)), HttpStatus.OK);
         }
         catch (Exception error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/GeneratePassword")
+    public ResponseEntity<?> generatePassword(@RequestBody GeneratePasswordRequest generatePasswordRequest) {
+        try {
+            return new ResponseEntity<>(new ApiResponse(true, userService.generatePassword(generatePasswordRequest)), HttpStatus.CREATED);
+        } catch (Exception error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
+
+        }
+    }
+
+    @PostMapping("/GeneratePin")
+    public ResponseEntity<?> generatePin(@RequestBody GeneratePinRequest generatePinRequest) {
+        try {
+            return new ResponseEntity<>(new ApiResponse(true, userService.generatePin(generatePinRequest)), HttpStatus.CREATED);
+        } catch (Exception error) {
             return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }

@@ -7,5 +7,4 @@ public class EditLoginInfoResponse {
     private String id;
     private String title;
     private String website;
-
 }

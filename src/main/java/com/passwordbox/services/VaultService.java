@@ -11,7 +11,7 @@ public interface VaultService {
 
     Vault createVault();
 
-    LoginInfo saveNewLogin(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault);
+    LoginInfo saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault);
 
     LoginInfo editLoginInformation(EditLoginInfoRequest editLoginInfoRequest, Vault vault);
 

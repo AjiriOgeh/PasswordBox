@@ -9,12 +9,12 @@ import com.passwordbox.dataTransferObjects.responses.*;
 
 import java.time.format.DateTimeFormatter;
 
-import static com.passwordbox.utilities.PasswordGenerator.generatePassword;
+import static com.passwordbox.utilities.PasscodeGenerator.generatePassword;
 
 public class Mappers {
     public static User registerRequestMap(RegisterRequest registerRequest, Vault vault) {
         User newUser = new User();
-        newUser.setUsername(registerRequest.getUsername());
+        newUser.setUsername(registerRequest.getUsername().toLowerCase());
         newUser.setMasterPassword(registerRequest.getMasterPassword());
         newUser.setVault(vault);
         return newUser;
@@ -24,7 +24,7 @@ public class Mappers {
         RegisterResponse registerResponse = new RegisterResponse();
         registerResponse.setId(user.getId());
         registerResponse.setUsername(user.getUsername());
-        registerResponse.setDateOfRegistration(user.getDateOfRegistration().format(DateTimeFormatter.ofPattern("MMM yyyy")));
+        registerResponse.setDateOfRegistration(user.getDateOfRegistration().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
         return registerResponse;
     }
 
@@ -44,26 +44,29 @@ public class Mappers {
 
     public static LoginInfo saveNewLoginInfoRequestMap(SaveNewLoginInfoRequest saveNewLoginInfoRequest) {
         LoginInfo loginInfo = new LoginInfo();
-        loginInfo.setTitle(saveNewLoginInfoRequest.getTitle());
+        loginInfo.setTitle(saveNewLoginInfoRequest.getTitle().toLowerCase());
         loginInfo.setWebsite(saveNewLoginInfoRequest.getWebsite());
         loginInfo.setLoginId(saveNewLoginInfoRequest.getLoginId());
-        loginInfo.setPassword(generatePassword());
+        if (saveNewLoginInfoRequest.getPassword() == null) loginInfo.setPassword(generatePassword(16));
+        else loginInfo.setPassword(saveNewLoginInfoRequest.getPassword());
         return loginInfo;
     }
 
     public static SaveNewLoginInfoResponse saveNewLoginInfoResponseMap(LoginInfo loginInfo){
         SaveNewLoginInfoResponse saveNewLoginInfoResponse = new SaveNewLoginInfoResponse();
         saveNewLoginInfoResponse.setId(loginInfo.getId());
-        saveNewLoginInfoResponse.setTitle(loginInfo.getTitle());
+        saveNewLoginInfoResponse.setTitle(loginInfo.getTitle().toLowerCase().trim());
         saveNewLoginInfoResponse.setWebsite(loginInfo.getWebsite());
+        saveNewLoginInfoResponse.setLoginId(loginInfo.getLoginId());
+        saveNewLoginInfoResponse.setPassword(loginInfo.getPassword());
         return saveNewLoginInfoResponse;
     }
 
     public static LoginInfo editLoginInfoRequestMap(EditLoginInfoRequest editLoginInfoRequest, LoginInfo loginInfo) {
-        loginInfo.setTitle(editLoginInfoRequest.getEditedTitle());
-        loginInfo.setLoginId(editLoginInfoRequest.getEditedLoginId());
-        loginInfo.setWebsite(editLoginInfoRequest.getEditedWebsite());
-        loginInfo.setPassword(editLoginInfoRequest.getEditedPassword());
+        if (editLoginInfoRequest.getEditedTitle() != null) loginInfo.setTitle(editLoginInfoRequest.getEditedTitle().toLowerCase().trim());
+        if (editLoginInfoRequest.getEditedLoginId() != null) loginInfo.setLoginId(editLoginInfoRequest.getEditedLoginId());
+        if (editLoginInfoRequest.getEditedWebsite() != null) loginInfo.setWebsite(editLoginInfoRequest.getEditedWebsite());
+        if (editLoginInfoRequest.getEditedPassword() != null) loginInfo.setPassword(editLoginInfoRequest.getEditedPassword());
         return loginInfo;
     }
 
@@ -77,7 +80,7 @@ public class Mappers {
 
     public static ViewLoginInfoResponse viewLoginInfoResponseMap(LoginInfo loginInfo){
         ViewLoginInfoResponse viewLoginInfoResponse = new ViewLoginInfoResponse();
-        viewLoginInfoResponse.setLoginId(loginInfo.getLoginId());
+        viewLoginInfoResponse.setId(loginInfo.getId());
         viewLoginInfoResponse.setTitle(loginInfo.getTitle());
         viewLoginInfoResponse.setWebsite(loginInfo.getWebsite());
         viewLoginInfoResponse.setLoginId(loginInfo.getLoginId());
@@ -94,7 +97,7 @@ public class Mappers {
 
     public static Note createNoteRequestMap(CreateNoteRequest createNoteRequest) {
         Note newNote = new Note();
-        newNote.setTitle(createNoteRequest.getTitle());
+        newNote.setTitle(createNoteRequest.getTitle().toLowerCase().trim());
         newNote.setContent(createNoteRequest.getContent());
         return newNote;
     }
@@ -108,8 +111,8 @@ public class Mappers {
     }
 
     public static Note editNoteRequestMap(EditNoteRequest editNoteRequest, Note note) {
-        note.setTitle(editNoteRequest.getEditedTitle());
-        note.setContent(editNoteRequest.getEditedContent());
+        if (editNoteRequest.getEditedTitle() != null) note.setTitle(editNoteRequest.getEditedTitle().toLowerCase().trim());
+        if (editNoteRequest.getEditedContent() != null) note.setContent(editNoteRequest.getEditedContent());
         return note;
     }
 
@@ -136,4 +139,17 @@ public class Mappers {
         return deleteNoteResponse;
     }
 
+    public static GeneratePasswordResponse generatePasswordResponseMap(String password) {
+        GeneratePasswordResponse generatePasswordResponse = new GeneratePasswordResponse();
+        generatePasswordResponse.setPassword(password);
+        generatePasswordResponse.setLength(password.length());
+        return generatePasswordResponse;
+    }
+
+    public static GeneratePinResponse generatePinResponseMap(String pin) {
+        GeneratePinResponse generatePinResponse = new GeneratePinResponse();
+        generatePinResponse.setPin(pin);
+        generatePinResponse.setLength(pin.length());
+        return generatePinResponse;
+    }
 }

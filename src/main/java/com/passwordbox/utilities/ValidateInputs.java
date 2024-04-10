@@ -12,7 +12,7 @@ public class ValidateInputs {
 
     private static boolean doesLoginInfoTitleExist(String title, Vault vault) {
         for(int count = 0; count < vault.getLoginInfos().size(); count++){
-            if (vault.getLoginInfos().get(count).getTitle().equals(title))
+            if (vault.getLoginInfos().get(count).getTitle().equals(title.toLowerCase()))
                 return true;
         }
         return false;
@@ -26,7 +26,7 @@ public class ValidateInputs {
 
     private static boolean doesNoteTitleExist(String title, Vault vault) {
         for(int count = 0; count < vault.getNotes().size(); count++){
-            if (vault.getNotes().get(count).getTitle().equals(title))
+            if (vault.getNotes().get(count).getTitle().equals(title.toLowerCase()))
                 return true;
         }
         return false;

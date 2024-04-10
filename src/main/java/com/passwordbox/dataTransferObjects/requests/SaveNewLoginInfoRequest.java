@@ -8,4 +8,5 @@ public class SaveNewLoginInfoRequest {
     private String title;
     private String website;
     private String loginId;
+    private String password;
 }

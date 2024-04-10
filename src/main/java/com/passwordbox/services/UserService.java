@@ -12,7 +12,7 @@ public interface UserService {
 
     SaveNewLoginInfoResponse saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest);
 
-    EditLoginInfoResponse editLoginInformation(EditLoginInfoRequest editLoginInfoRequest);
+    EditLoginInfoResponse editLoginInfo(EditLoginInfoRequest editLoginInfoRequest);
 
     ViewLoginInfoResponse viewLoginInfo(ViewLoginInfoRequest viewLoginInfoRequest);
 
@@ -25,4 +25,8 @@ public interface UserService {
     ViewNoteResponse viewNote(ViewNoteRequest viewNoteRequest);
 
     DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest);
+
+    GeneratePasswordResponse generatePassword(GeneratePasswordRequest generatePasswordRequest);
+
+    GeneratePinResponse generatePin(GeneratePinRequest generatePinRequest);
 }

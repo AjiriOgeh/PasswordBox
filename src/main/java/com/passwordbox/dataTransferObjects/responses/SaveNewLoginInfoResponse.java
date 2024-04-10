@@ -7,4 +7,6 @@ public class SaveNewLoginInfoResponse {
     private String id;
     private String title;
     private String website;
+    private String loginId;
+    private String password;
 }

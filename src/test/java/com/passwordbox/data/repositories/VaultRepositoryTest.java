@@ -14,7 +14,7 @@ public class VaultRepositoryTest {
     VaultRepository vaultRepository;
 
     @Test
-    public void vaultIsCreated_VaultIsSaved(){
+    public void vaultIsCreated_VaultIsSavedTest(){
         Vault vault = new Vault();
         vaultRepository.save(vault);
         assertEquals(1, vaultRepository.count());

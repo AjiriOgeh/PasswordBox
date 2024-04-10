@@ -246,16 +246,49 @@ public class UserControllerTest {
         var response = userController.saveNewLoginInfo(saveNewLoginInfoRequest);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
-    /*
-    *
-    *
-    *
-    *
-    *
-    *
-    *
-    *
-    * */
+
+    @Test
+    public void userEditsLoginInfoTest() {
+        EditLoginInfoRequest editLoginInfoRequest = new EditLoginInfoRequest();
+        editLoginInfoRequest.setUsername("jack123");
+        editLoginInfoRequest.setTitle("GMAIl login");
+        editLoginInfoRequest.setEditedTitle("yahoo login");
+        editLoginInfoRequest.setEditedWebsite("www.yahoo.com");
+        editLoginInfoRequest.setEditedLoginId("jack123@yahoo.com");
+        editLoginInfoRequest.setEditedPassword("password");
+
+        var response = userController.editLoginInfo(editLoginInfoRequest);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    }
+
+    @Test
+    public void nonExistentUserEditsLoginInfoTest() {
+        EditLoginInfoRequest editLoginInfoRequest = new EditLoginInfoRequest();
+        editLoginInfoRequest.setUsername("jim456");
+        editLoginInfoRequest.setTitle("gmail login");
+        editLoginInfoRequest.setEditedTitle("yahoo login");
+        editLoginInfoRequest.setEditedWebsite("www.yahoo.com");
+        editLoginInfoRequest.setEditedLoginId("jack123@yahoo.com");
+        editLoginInfoRequest.setEditedPassword("password");
+
+        var response = userController.editLoginInfo(editLoginInfoRequest);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void userEditsNonExistentLoginInfoTest() {
+        EditLoginInfoRequest editLoginInfoRequest = new EditLoginInfoRequest();
+        editLoginInfoRequest.setUsername("jack123");
+        editLoginInfoRequest.setTitle("hotmail login");
+        editLoginInfoRequest.setEditedTitle("yahoo login");
+        editLoginInfoRequest.setEditedWebsite("www.yahoo.com");
+        editLoginInfoRequest.setEditedLoginId("jack123@yahoo.com");
+        editLoginInfoRequest.setEditedPassword("password");
+
+        var response = userController.editLoginInfo(editLoginInfoRequest);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
 
     @Test
     public void userViewsLoginInfoTest(){
@@ -385,21 +418,43 @@ public class UserControllerTest {
         var response = userController.createNote(createNoteRequest);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
-    /*
-
 
     @Test
-    public void saveNewLoginInfo_TitleExistsTest() {
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
+    public void userEditsNoteTest() {
+        EditNoteRequest editNoteRequest = new EditNoteRequest();
+        editNoteRequest.setUsername("jack123");
+        editNoteRequest.setTitle("ideas");
+        editNoteRequest.setEditedTitle("new ideas");
+        editNoteRequest.setEditedContent("Build Robots for heart surgeries");
 
-        var response = userController.saveNewLoginInfo(saveNewLoginInfoRequest);
+        var response = userController.editNote(editNoteRequest);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void nonExistentUserEditsNoteTest() {
+        EditNoteRequest editNoteRequest = new EditNoteRequest();
+        editNoteRequest.setUsername("jim456");
+        editNoteRequest.setTitle("ideas");
+        editNoteRequest.setEditedTitle("new ideas");
+        editNoteRequest.setEditedContent("Build Robots for heart surgeries");
+
+        var response = userController.editNote(editNoteRequest);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
 
-    }*/
+    @Test
+    public void userEditsNonExistentNoteTest() {
+        EditNoteRequest editNoteRequest = new EditNoteRequest();
+        editNoteRequest.setUsername("jim456");
+        editNoteRequest.setTitle("old ideas");
+        editNoteRequest.setEditedTitle("new ideas");
+        editNoteRequest.setEditedContent("Build Robots for heart surgeries");
+
+        var response = userController.editNote(editNoteRequest);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
     @Test
     public void userViewsNoteTest() {
         ViewNoteRequest viewNoteRequest = new ViewNoteRequest();
@@ -431,7 +486,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void userDeletesNote() {
+    public void userDeletesNoteTest() {
         DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
         deleteNoteRequest.setUsername("jack123");
         deleteNoteRequest.setTitle("ideas");
@@ -463,5 +518,40 @@ public class UserControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
+    @Test
+    public void userGeneratesPasswordTest() {
+        GeneratePasswordRequest generatePasswordRequest = new GeneratePasswordRequest();
+        generatePasswordRequest.setLength("16");
+
+        var response = userController.generatePassword(generatePasswordRequest);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    @Test
+    public void userGeneratesPassword_LengthIsNotANumberTest() {
+        GeneratePasswordRequest generatePasswordRequest = new GeneratePasswordRequest();
+        generatePasswordRequest.setLength("A");
+
+        var response = userController.generatePassword(generatePasswordRequest);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void userGeneratesPinTest() {
+        GeneratePinRequest generatePinRequest = new GeneratePinRequest();
+        generatePinRequest.setLength("8");
+
+        var response = userController.generatePin(generatePinRequest);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    @Test
+    public void userGeneratesPin_LengthIsNOtANumberTest() {
+        GeneratePinRequest generatePinRequest = new GeneratePinRequest();
+        generatePinRequest.setLength("#");
+
+        var response = userController.generatePin(generatePinRequest);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
 
 }

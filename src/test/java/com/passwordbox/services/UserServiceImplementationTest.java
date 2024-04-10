@@ -575,7 +575,7 @@ public class UserServiceImplementationTest {
         assertEquals(1, loginInfoRepository.count());
         assertThrows(IllegalArgumentException.class, ()->userService.saveNewLoginInfo(saveNewLoginInfoRequest));
     }
-/*
+
     @Test
     public void userSavesLoginInformation_UserEditLoginInformationTest() {
         assertEquals(0, userRepository.count());
@@ -594,7 +594,7 @@ public class UserServiceImplementationTest {
         saveNewLoginInfoRequest.setTitle("gmail login");
         saveNewLoginInfoRequest.setWebsite("www.gmail.com");
         saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLogin(saveNewLoginInfoRequest);
+        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
 
         User jackSafeBox = userRepository.findByUsername("jack123");
 
@@ -613,7 +613,7 @@ public class UserServiceImplementationTest {
         editLoginInfoRequest.setEditedWebsite("www.yahoo.com");
         editLoginInfoRequest.setEditedLoginId("jack123@yahoo.com");
         editLoginInfoRequest.setEditedPassword("password");
-        EditLoginInfoResponse editLoginInfoResponse = userService.editLoginInformation(editLoginInfoRequest);
+        EditLoginInfoResponse editLoginInfoResponse = userService.editLoginInfo(editLoginInfoRequest);
 
         jackSafeBox = userRepository.findByUsername("jack123");
 
@@ -646,7 +646,7 @@ public class UserServiceImplementationTest {
         saveNewLoginInfoRequest.setTitle("gmail login");
         saveNewLoginInfoRequest.setWebsite("www.gmail.com");
         saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLogin(saveNewLoginInfoRequest);
+        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
 
         User jackSafeBox = userRepository.findByUsername("jack123");
 
@@ -666,7 +666,7 @@ public class UserServiceImplementationTest {
         editLoginInfoRequest.setEditedLoginId("jim456@yahoo.com");
         editLoginInfoRequest.setEditedPassword("password");
 
-        assertThrows(UserNotFoundException.class, ()->userService.editLoginInformation(editLoginInfoRequest));
+        assertThrows(UserNotFoundException.class, ()->userService.editLoginInfo(editLoginInfoRequest));
     }
 
     @Test
@@ -687,7 +687,7 @@ public class UserServiceImplementationTest {
         saveNewLoginInfoRequest.setTitle("gmail login");
         saveNewLoginInfoRequest.setWebsite("www.gmail.com");
         saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLogin(saveNewLoginInfoRequest);
+        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
 
         User jackSafeBox = userRepository.findByUsername("jack123");
 
@@ -716,7 +716,7 @@ public class UserServiceImplementationTest {
         editLoginInfoRequest.setEditedLoginId("jack123@yahoo.com");
         editLoginInfoRequest.setEditedPassword("password");
 
-        assertThrows(ProfileLockStateException.class, ()->userService.editLoginInformation(editLoginInfoRequest));
+        assertThrows(ProfileLockStateException.class, ()->userService.editLoginInfo(editLoginInfoRequest));
     }
 
     @Test
@@ -737,7 +737,7 @@ public class UserServiceImplementationTest {
         saveNewLoginInfoRequest.setTitle("gmail login");
         saveNewLoginInfoRequest.setWebsite("www.gmail.com");
         saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLogin(saveNewLoginInfoRequest);
+        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
 
         User jackSafeBox = userRepository.findByUsername("jack123");
 
@@ -757,9 +757,8 @@ public class UserServiceImplementationTest {
         editLoginInfoRequest.setEditedLoginId("jack123@yahoo.com");
         editLoginInfoRequest.setEditedPassword("password");
 
-        assertThrows(LoginInfoNotFoundException.class, ()->userService.editLoginInformation(editLoginInfoRequest));
+        assertThrows(LoginInfoNotFoundException.class, ()->userService.editLoginInfo(editLoginInfoRequest));
     }
-*/
     @Test
     public void userSavesLoginInfo_UserViewsLoginInfoTest() {
         assertEquals(0, userRepository.count());
@@ -1201,41 +1200,6 @@ public class UserServiceImplementationTest {
         assertThrows(LoginInfoNotFoundException.class, ()->userService.deleteLoginInfo(deleteLoginInfoRequest));
     }
 
-    /*
-    *     @Test
-    public void userSignsUp_UserSavesLoginInformationTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginRequest saveNewLoginRequest = new SaveNewLoginRequest();
-        saveNewLoginRequest.setUsername("jack123");
-        saveNewLoginRequest.setTitle("gmail login");
-        saveNewLoginRequest.setWebsite("www.gmail.com");
-        saveNewLoginRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginResponse saveNewLoginResponse = userService.saveNewLogin(saveNewLoginRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInformationRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInformation().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInformation().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInformationRepository.findAll().getFirst().getLoginId());
-    }
-    *
-    *
-    * */
-
     @Test
     public void userSignsUp_UserCreatesNoteTest() {
         assertEquals(0, userRepository.count());
@@ -1441,7 +1405,7 @@ public class UserServiceImplementationTest {
 
         assertThrows(IllegalArgumentException.class, ()->userService.createNote(createNoteRequest));
     }
-/*
+
     @Test
     public void userSignsUp_UserCreatesNote_UserEditsNoteTest() {
         assertEquals(0, userRepository.count());
@@ -1486,7 +1450,7 @@ public class UserServiceImplementationTest {
         assertEquals("Build Robots for heart surgeries", editNoteResponse.getContent());
         assertEquals("new ideas", noteRepository.findAll().getFirst().getTitle());
     }
-    //
+
     @Test
     public void userSignsUp_CreatesNote_UserLogsOut_UserEditsNote_ThrowsExceptionTest() {
         assertEquals(0, userRepository.count());
@@ -1652,7 +1616,7 @@ public class UserServiceImplementationTest {
 
         assertThrows(IllegalArgumentException.class, ()-> userService.editNote(editNoteRequest));
     }
-*/
+
     @Test
     public void userCreatesNote_UserViewsNoteTest() {
         assertEquals(0, userRepository.count());
@@ -1963,5 +1927,72 @@ public class UserServiceImplementationTest {
         assertThrows(InvalidPasswordException.class, ()->userService.deleteNote(deleteNoteRequest));
     }
 
+    @Test
+    public void userGeneratesPasswordTest() {
+        GeneratePasswordRequest generatePasswordRequest = new GeneratePasswordRequest();
+        generatePasswordRequest.setLength("12");
+        GeneratePasswordResponse generatePasswordResponse = userService.generatePassword(generatePasswordRequest);
+
+        assertEquals(12, generatePasswordResponse.getLength());
+        assertNotNull(generatePasswordResponse.getPassword());
+    }
+
+    @Test
+    public void userGeneratesPassword_LengthIsNotANumber_ThrowsExceptionTest() {
+        GeneratePasswordRequest generatePasswordRequest = new GeneratePasswordRequest();
+        generatePasswordRequest.setLength("A");
+
+        assertThrows(InvalidPasscodeLengthException.class, ()->userService.generatePassword(generatePasswordRequest));
+    }
+
+    @Test
+    public void userGeneratesPassword_NumberIsNegative_ThrowsException() {
+        GeneratePasswordRequest generatePasswordRequest = new GeneratePasswordRequest();
+        generatePasswordRequest.setLength("-1");
+
+        assertThrows(InvalidPasscodeLengthException.class, ()->userService.generatePassword(generatePasswordRequest));
+    }
+
+    @Test
+    public void userGeneratesPassword_NumberIsGreaterThan30_ThrowsException() {
+        GeneratePasswordRequest generatePasswordRequest = new GeneratePasswordRequest();
+        generatePasswordRequest.setLength("31");
+
+        assertThrows(InvalidPasscodeLengthException.class, ()->userService.generatePassword(generatePasswordRequest));
+    }
+
+    @Test
+    public void userGeneratesPinTest() {
+        GeneratePinRequest generatePinRequest = new GeneratePinRequest();
+        generatePinRequest.setLength("8");
+        GeneratePinResponse generatePinResponse = userService.generatePin(generatePinRequest);
+
+        assertEquals(8, generatePinResponse.getLength());
+        assertNotNull(generatePinResponse.getPin());
+    }
+
+    @Test
+    public void userGeneratesPin_LengthIsNegative_ThrowsExceptionTest() {
+        GeneratePinRequest generatePinRequest = new GeneratePinRequest();
+        generatePinRequest.setLength("-1");
+
+        assertThrows(InvalidPasscodeLengthException.class, ()->userService.generatePin(generatePinRequest));
+    }
+
+    @Test
+    public void userGeneratesPin_LengthIsNotANumber_ThrowsExceptionTest() {
+        GeneratePinRequest generatePinRequest = new GeneratePinRequest();
+        generatePinRequest.setLength("B");
+
+        assertThrows(InvalidPasscodeLengthException.class, ()->userService.generatePin(generatePinRequest));
+    }
+
+    @Test
+    public void userGeneratesPin_LengthIsLessThan1_ThrowsExceptionTest() {
+        GeneratePinRequest generatePinRequest = new GeneratePinRequest();
+        generatePinRequest.setLength("0");
+
+        assertThrows(InvalidPasscodeLengthException.class, ()->userService.generatePin(generatePinRequest));
+    }
 
 }

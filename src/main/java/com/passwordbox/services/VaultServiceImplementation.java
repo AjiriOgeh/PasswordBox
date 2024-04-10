@@ -7,10 +7,12 @@ import com.passwordbox.data.repositories.VaultRepository;
 import com.passwordbox.dataTransferObjects.requests.*;
 import com.passwordbox.dataTransferObjects.responses.DeleteLoginInfoResponse;
 import com.passwordbox.dataTransferObjects.responses.DeleteNoteResponse;
-import com.passwordbox.exceptions.LoginInfoNotFoundException;
 import com.passwordbox.exceptions.NoteNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static com.passwordbox.utilities.FindDetails.findLoginInfoInVault;
+import static com.passwordbox.utilities.FindDetails.findNoteInVault;
 
 @Service
 public class VaultServiceImplementation implements VaultService{
@@ -32,7 +34,7 @@ public class VaultServiceImplementation implements VaultService{
     }
 
     @Override
-    public LoginInfo saveNewLogin(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault) {
+    public LoginInfo saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault) {
         LoginInfo loginInfo = loginInfoService.saveNewLoginInfo(saveNewLoginInfoRequest, vault);
         vault.getLoginInfos().add(loginInfo);
         vaultRepository.save(vault);
@@ -48,19 +50,11 @@ public class VaultServiceImplementation implements VaultService{
 
     @Override
     public DeleteLoginInfoResponse deleteLoginInformation(DeleteLoginInfoRequest deleteLoginInfoRequest, Vault vault) {
-        LoginInfo loginInfo = findLoginInfoInVault(deleteLoginInfoRequest.getTitle(), vault);
+        LoginInfo loginInfo = findLoginInfoInVault(deleteLoginInfoRequest.getTitle().toLowerCase(), vault);
         DeleteLoginInfoResponse deleteLoginInfoResponse = loginInfoService.deleteLoginInfo(deleteLoginInfoRequest, vault);
         vault.getLoginInfos().remove(loginInfo);
         vaultRepository.save(vault);
         return deleteLoginInfoResponse;
-    }
-
-    private LoginInfo findLoginInfoInVault(String title, Vault vault) {
-        for(int count = 0; count < vault.getLoginInfos().size(); count++){
-            if (vault.getLoginInfos().get(count).getTitle().equals(title))
-                return vault.getLoginInfos().get(count);
-        }
-        throw new LoginInfoNotFoundException("Login Info does not Exist. Please Try Again");
     }
 
     @Override
@@ -80,19 +74,11 @@ public class VaultServiceImplementation implements VaultService{
 
     @Override
     public DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest, Vault vault) {
-        Note note = findNoteInVault(deleteNoteRequest.getTitle(), vault);
+        Note note = findNoteInVault(deleteNoteRequest.getTitle().toLowerCase(), vault);
         DeleteNoteResponse deleteNoteResponse = noteService.deleteNote(deleteNoteRequest, vault);
         vault.getNotes().remove(note);
         vaultRepository.save(vault);
         return deleteNoteResponse;
-    }
-
-    private Note findNoteInVault(String title, Vault vault) {
-        for(int count = 0; count < vault.getNotes().size(); count++){
-            if (vault.getNotes().get(count).getTitle().equals(title))
-                return vault.getNotes().get(count);
-        }
-        throw new NoteNotFoundException("Note does not Exist. Please Try Again");
     }
 
 }

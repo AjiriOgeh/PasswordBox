@@ -7,10 +7,10 @@ import com.passwordbox.dataTransferObjects.requests.DeleteLoginInfoRequest;
 import com.passwordbox.dataTransferObjects.requests.EditLoginInfoRequest;
 import com.passwordbox.dataTransferObjects.requests.SaveNewLoginInfoRequest;
 import com.passwordbox.dataTransferObjects.responses.DeleteLoginInfoResponse;
-import com.passwordbox.exceptions.LoginInfoNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.passwordbox.utilities.FindDetails.findLoginInfoInVault;
 import static com.passwordbox.utilities.Mappers.*;
 import static com.passwordbox.utilities.ValidateInputs.validateLoginInfoTitle;
 
@@ -29,31 +29,19 @@ public class LoginInfoServiceImplementation implements LoginInfoService {
 
     @Override
     public LoginInfo editLoginInfo(EditLoginInfoRequest editLoginInfoRequest, Vault vault) {
-        //refactor this part of the code make sure it matches existing object(The title)
-        // change the validateLoginInformation
-        LoginInfo loginInfo = findLoginInformationInVault(editLoginInfoRequest.getTitle(), vault);
+        LoginInfo loginInfo = findLoginInfoInVault(editLoginInfoRequest.getTitle().toLowerCase(), vault);
         validateLoginInfoTitle(editLoginInfoRequest.getEditedTitle(), vault);
-        editLoginInfoRequestMap(editLoginInfoRequest, loginInfo);
-        loginInfoRepository.save(loginInfo);
-        return loginInfo;
-
+        LoginInfo updatedLoginInfo = editLoginInfoRequestMap(editLoginInfoRequest, loginInfo);
+        loginInfoRepository.save(updatedLoginInfo);
+        return updatedLoginInfo;
     }
 
     @Override
     public DeleteLoginInfoResponse deleteLoginInfo(DeleteLoginInfoRequest deleteLoginInfoRequest, Vault vault) {
-        LoginInfo loginInfo = findLoginInformationInVault(deleteLoginInfoRequest.getTitle(), vault);
+        LoginInfo loginInfo = findLoginInfoInVault(deleteLoginInfoRequest.getTitle().toLowerCase(), vault);
         DeleteLoginInfoResponse deleteLoginInfoResponse = deleteLoginInfoResponseMap(loginInfo);
         loginInfoRepository.delete(loginInfo);
         return deleteLoginInfoResponse;
-    }
-
-
-    private LoginInfo findLoginInformationInVault(String title, Vault vault) {
-        for(int count = 0; count < vault.getLoginInfos().size(); count++){
-            if (vault.getLoginInfos().get(count).getTitle().equals(title))
-                return vault.getLoginInfos().get(count);
-        }
-        throw new LoginInfoNotFoundException("Login Info does not Exist. Please Try Again");
     }
 
 }
