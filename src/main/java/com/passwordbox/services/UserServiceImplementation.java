@@ -1,9 +1,6 @@
 package com.passwordbox.services;
 
-import com.passwordbox.data.models.LoginInfo;
-import com.passwordbox.data.models.Note;
-import com.passwordbox.data.models.User;
-import com.passwordbox.data.models.Vault;
+import com.passwordbox.data.models.*;
 import com.passwordbox.data.repositories.UserRepository;
 import com.passwordbox.dataTransferObjects.requests.*;
 import com.passwordbox.dataTransferObjects.responses.*;
@@ -13,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import static com.passwordbox.utilities.FindDetails.findLoginInfoInVault;
-import static com.passwordbox.utilities.FindDetails.findNoteInVault;
+import static com.passwordbox.utilities.FindDetails.*;
 import static com.passwordbox.utilities.Mappers.*;
 
 @Service
@@ -89,7 +85,7 @@ public class UserServiceImplementation implements UserService{
         User user = userRepository.findByUsername(editLoginInfoRequest.getUsername().toLowerCase());
         if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", editLoginInfoRequest.getUsername()));
         if (user.isLocked()) throw new ProfileLockStateException("Please Login to Edit Login Info");
-        LoginInfo loginInfo = vaultService.editLoginInformation(editLoginInfoRequest, user.getVault());
+        LoginInfo loginInfo = vaultService.editLoginInfo(editLoginInfoRequest, user.getVault());
         userRepository.save(user);
         return editLoginInfoResponseMap(loginInfo);
     }
@@ -109,7 +105,7 @@ public class UserServiceImplementation implements UserService{
         if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", deleteLoginInfoRequest.getUsername()));
         if (user.isLocked()) throw new ProfileLockStateException("Please Login to delete Login Info");
         if (!user.getMasterPassword().equals(deleteLoginInfoRequest.getMasterPassword())) throw new InvalidPasswordException("Incorrect password. Please Try again");
-        return vaultService.deleteLoginInformation(deleteLoginInfoRequest, user.getVault());
+        return vaultService.deleteLoginInfo(deleteLoginInfoRequest, user.getVault());
     }
 
     @Override
@@ -155,6 +151,10 @@ public class UserServiceImplementation implements UserService{
         String password = PasscodeGenerator.generatePassword(Integer.parseInt(generatePasswordRequest.getLength()));
         return generatePasswordResponseMap(password);
     }
+    private static void validatePasscodeLength(String passcodeLength) {
+        if (!passcodeLength.matches("\\d+")) throw new InvalidPasscodeLengthException("Please Enter a Valid Number");
+        if (Integer.parseInt(passcodeLength) < 1 || Integer.parseInt(passcodeLength) > 30) throw new InvalidPasscodeLengthException("Please Enter a Number between 1 - 30");
+    }
 
     @Override
     public GeneratePinResponse generatePin(GeneratePinRequest generatePinRequest) {
@@ -163,9 +163,54 @@ public class UserServiceImplementation implements UserService{
         return generatePinResponseMap(pin);
     }
 
-    private static void validatePasscodeLength(String passcodeLength) {
-        if (!passcodeLength.matches("\\d+")) throw new InvalidPasscodeLengthException("Please Enter a Valid Number");
-        if (Integer.parseInt(passcodeLength) < 1 || Integer.parseInt(passcodeLength) > 30) throw new InvalidPasscodeLengthException("Please Enter a Number between 1 - 30");
+    @Override
+    public SaveCreditCardResponse saveCreditCard(SaveCreditCardRequest saveCreditCardRequest) {
+        User user = userRepository.findByUsername(saveCreditCardRequest.getUsername());
+        CreditCard creditCard = vaultService.saveCreditCard(saveCreditCardRequest, user.getVault());
+        userRepository.save(user);
+        return saveCreditCardResponseMap(creditCard);
     }
 
+    @Override
+    public EditCreditCardResponse editCreditCard(EditCreditCardRequest editCreditCardRequest) {
+        User user = userRepository.findByUsername(editCreditCardRequest.getUsername());
+        CreditCard creditCard = vaultService.editCreditCard(editCreditCardRequest, user.getVault());
+        return editCreditCardResponseMap(creditCard);
+    }
+
+    @Override
+    public ViewCreditCardResponse viewCreditCard(ViewCreditCardRequest viewCreditCardRequest) {
+        User user = userRepository.findByUsername(viewCreditCardRequest.getUsername());
+        CreditCard creditCard = findCreditCardInVault(viewCreditCardRequest.getTitle(), user.getVault());
+        return viewCreditCardResponseMap(creditCard);
+    }
+
+    @Override
+    public DeleteCreditCardResponse deleteCreditCard(DeleteCreditCardRequest deleteCreditCardRequest) {
+        User user = userRepository.findByUsername(deleteCreditCardRequest.getUsername());
+        //if (!user.getMasterPassword().equals(deleteCreditCardRequest.getMasterPassword()));
+        return vaultService.deleteCreditCard(deleteCreditCardRequest, user.getVault());
+    }
+
+    @Override
+    public SavePassportResponse savePassport(SavePassportRequest savePassportRequest) {
+        User user = userRepository.findByUsername(savePassportRequest.getUsername());
+        Passport passport = vaultService.savePassport(savePassportRequest, user.getVault());
+        userRepository.save(user);
+        return savePassportResponseMap(passport);
+    }
+
+    @Override
+    public ViewPassportResponse viewPassport(ViewPassportRequest viewPassportRequest) {
+        return null;
+    }
+
+    @Override
+    public DeletePassportResponse deletePassport(DeletePassportRequest deletePassportRequest) {
+        User user = userRepository.findByUsername(deletePassportRequest.getUsername());
+        return vaultService.deletePassport(deletePassportRequest, user.getVault());
+    }
+
+
 }
+

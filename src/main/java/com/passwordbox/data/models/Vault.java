@@ -17,4 +17,8 @@ public class Vault {
     private List<LoginInfo> loginInfos = new ArrayList<>();
     @DBRef
     private List<Note> notes = new ArrayList<>();
-}
+    @DBRef
+    private List<CreditCard> creditCards = new ArrayList<>();
+    @DBRef
+    private List<Passport> passports = new ArrayList<>();
+ }

@@ -1,10 +1,7 @@
 package com.passwordbox.services;
 
 import com.passwordbox.data.models.User;
-import com.passwordbox.data.repositories.LoginInfoRepository;
-import com.passwordbox.data.repositories.NoteRepository;
-import com.passwordbox.data.repositories.UserRepository;
-import com.passwordbox.data.repositories.VaultRepository;
+import com.passwordbox.data.repositories.*;
 import com.passwordbox.dataTransferObjects.requests.*;
 import com.passwordbox.dataTransferObjects.responses.*;
 import com.passwordbox.exceptions.*;
@@ -34,12 +31,20 @@ public class UserServiceImplementationTest {
     @Autowired
     private NoteRepository noteRepository;
 
+    @Autowired
+    private CreditCardRepository creditCardRepository;
+
+    @Autowired
+    private PassportRepository passportRepository;
+
     @BeforeEach
     public void setUp() {
         userRepository.deleteAll();
         vaultRepository.deleteAll();
         loginInfoRepository.deleteAll();
         noteRepository.deleteAll();
+        creditCardRepository.deleteAll();
+        passportRepository.deleteAll();
     }
 
     @Test
@@ -1994,5 +1999,353 @@ public class UserServiceImplementationTest {
 
         assertThrows(InvalidPasscodeLengthException.class, ()->userService.generatePin(generatePinRequest));
     }
+
+    @Test
+    public void userSavesCreditCardTest() {
+        assertEquals(0, userRepository.count());
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(1, userRepository.count());
+        assertEquals("jack123", jackRegisterResponse.getUsername());
+
+        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
+        saveCreditCardRequest.setUsername("jack123");
+        saveCreditCardRequest.setTitle("gtb savings card");
+        saveCreditCardRequest.setCardNumber("5399831619690403");
+        saveCreditCardRequest.setExpiryDate("01/2025");
+        saveCreditCardRequest.setPin("1234");
+        saveCreditCardRequest.setCVV("567");
+        saveCreditCardRequest.setAdditionalInformation("for personal use");
+        SaveCreditCardResponse jackSaveCreditCardResponse = userService.saveCreditCard(saveCreditCardRequest);
+
+        User jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
+        assertEquals(1, creditCardRepository.count());
+        assertEquals("gtb savings card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
+        assertEquals("gtb savings card", jackSaveCreditCardResponse.getTitle());
+    }
+
+    @Test
+    public void userEditsCreditCardTest() {
+        assertEquals(0, userRepository.count());
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(1, userRepository.count());
+        assertEquals("jack123", jackRegisterResponse.getUsername());
+
+        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
+        saveCreditCardRequest.setUsername("jack123");
+        saveCreditCardRequest.setTitle("gtb savings card");
+        saveCreditCardRequest.setCardNumber("5399831619690403");
+        saveCreditCardRequest.setExpiryDate("01/2025");
+        saveCreditCardRequest.setPin("1234");
+        saveCreditCardRequest.setCVV("567");
+        saveCreditCardRequest.setAdditionalInformation("for personal use");
+        SaveCreditCardResponse jackSaveCreditCardResponse = userService.saveCreditCard(saveCreditCardRequest);
+
+        User jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
+        assertEquals(1, creditCardRepository.count());
+        assertEquals("gtb savings card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
+        assertEquals("gtb savings card", jackSaveCreditCardResponse.getTitle());
+
+        EditCreditCardRequest editCreditCardRequest = new EditCreditCardRequest();
+        editCreditCardRequest.setUsername("jack123");
+        editCreditCardRequest.setTitle("gtb savings card");
+        editCreditCardRequest.setUpdateTitle("gtb current card");
+        editCreditCardRequest.setUpdatedCardNumber("5313581000123430");
+        editCreditCardRequest.setUpdatedCardNumber("01/2028");
+        editCreditCardRequest.setUpdatedAdditionalInformation("for office use");
+        EditCreditCardResponse jackEditCreditCardResponse = userService.editCreditCard(editCreditCardRequest);
+
+        jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
+        assertEquals("gtb current card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
+        assertEquals(1, creditCardRepository.count());
+        assertEquals(jackSafeBox.getVault().getCreditCards().getFirst().getId(), jackEditCreditCardResponse.getId());
+    }
+
+    @Test
+    public void userViewsCreditCardTest() {
+        assertEquals(0, userRepository.count());
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(1, userRepository.count());
+        assertEquals("jack123", jackRegisterResponse.getUsername());
+
+        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
+        saveCreditCardRequest.setUsername("jack123");
+        saveCreditCardRequest.setTitle("gtb savings card");
+        saveCreditCardRequest.setCardNumber("5399831619690403");
+        saveCreditCardRequest.setExpiryDate("01/2025");
+        saveCreditCardRequest.setPin("1234");
+        saveCreditCardRequest.setCVV("567");
+        saveCreditCardRequest.setAdditionalInformation("for personal use");
+        SaveCreditCardResponse jackSaveCreditCardResponse = userService.saveCreditCard(saveCreditCardRequest);
+
+        User jackSafeBox = userRepository.findByUsername("jack123");
+        String id = jackSafeBox.getVault().getCreditCards().getFirst().getId();
+
+        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
+        assertEquals(1, creditCardRepository.count());
+        assertEquals("gtb savings card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
+        assertEquals("gtb savings card", jackSaveCreditCardResponse.getTitle());
+
+        ViewCreditCardRequest viewCreditCardRequest = new ViewCreditCardRequest();
+        viewCreditCardRequest.setUsername("jack123");
+        viewCreditCardRequest.setTitle("gtb savings card");
+
+        ViewCreditCardResponse jackViewCreditCardResponse = userService.viewCreditCard(viewCreditCardRequest);
+        assertEquals(1, creditCardRepository.count());
+        assertEquals("gtb savings card", jackViewCreditCardResponse.getTitle());
+    }
+
+    @Test
+    public void userDeletesCreditCardTest(){
+        assertEquals(0, userRepository.count());
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(1, userRepository.count());
+        assertEquals("jack123", jackRegisterResponse.getUsername());
+
+        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
+        saveCreditCardRequest.setUsername("jack123");
+        saveCreditCardRequest.setTitle("gtb savings card");
+        saveCreditCardRequest.setCardNumber("5399831619690403");
+        saveCreditCardRequest.setExpiryDate("01/2025");
+        saveCreditCardRequest.setPin("1234");
+        saveCreditCardRequest.setCVV("567");
+        saveCreditCardRequest.setAdditionalInformation("for personal use");
+        SaveCreditCardResponse jackSaveCreditCardResponse = userService.saveCreditCard(saveCreditCardRequest);
+
+        User jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
+        assertEquals(1, creditCardRepository.count());
+        assertEquals("gtb savings card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
+        assertEquals("gtb savings card", jackSaveCreditCardResponse.getTitle());
+
+        DeleteCreditCardRequest deleteCreditCardRequest = new DeleteCreditCardRequest();
+        deleteCreditCardRequest.setUsername("jack123");
+        deleteCreditCardRequest.setTitle("gtb savings card");
+        deleteCreditCardRequest.setMasterPassword("Password123.");
+        DeleteCreditCardResponse jackDeleteCreditCardResponse = userService.deleteCreditCard(deleteCreditCardRequest);
+
+        jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(0, jackSafeBox.getVault().getCreditCards().size());
+        assertEquals(0, vaultRepository.findAll().getFirst().getCreditCards().size());
+        assertEquals(0, creditCardRepository.count());
+        assertEquals("gtb savings card", jackDeleteCreditCardResponse.getTitle());
+
+    }
+
+    @Test
+    public void savePassportTest() {
+        assertEquals(0, userRepository.count());
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(1, userRepository.count());
+        assertEquals("jack123", jackRegisterResponse.getUsername());
+
+        SavePassportRequest savePassportRequest = new SavePassportRequest();
+        savePassportRequest.setUsername("jack123");
+        savePassportRequest.setTitle("my personal passport");
+        savePassportRequest.setSurname("smith");
+        savePassportRequest.setGivenNames("john scott");
+        savePassportRequest.setNationality("british");
+        savePassportRequest.setPlaceOfBirth("london");
+        savePassportRequest.setDateOfBirth("");
+        savePassportRequest.setPassportNumber("533401372");
+        savePassportRequest.setIssueDate("");
+        savePassportRequest.setExpiryDate("");
+        SavePassportResponse jackSavePassportResponse = userService.savePassport(savePassportRequest);
+
+        User jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(1, passportRepository.count());
+        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
+        assertEquals(1, jackSafeBox.getVault().getPassports().size());
+        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
+        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
+    }
+
+    @Test
+    public void userEditsPassportTest() {
+        assertEquals(0, userRepository.count());
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(1, userRepository.count());
+        assertEquals("jack123", jackRegisterResponse.getUsername());
+
+        SavePassportRequest savePassportRequest = new SavePassportRequest();
+        savePassportRequest.setUsername("jack123");
+        savePassportRequest.setTitle("my personal passport");
+        savePassportRequest.setSurname("smith");
+        savePassportRequest.setGivenNames("john scott");
+//        savePassportRequest.setNationality("british");
+//        savePassportRequest.setPlaceOfBirth("london");
+//        savePassportRequest.setDateOfBirth("");
+        savePassportRequest.setPassportNumber("533401372");
+//        savePassportRequest.setIssueDate("");
+//        savePassportRequest.setExpiryDate("");
+        SavePassportResponse jackSavePassportResponse = userService.savePassport(savePassportRequest);
+
+        User jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(1, passportRepository.count());
+        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
+        assertEquals(1, jackSafeBox.getVault().getPassports().size());
+        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
+        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
+        assertNull(jackSafeBox.getVault().getPassports().getFirst().getNationality());
+        assertNull(jackSafeBox.getVault().getPassports().getFirst().getPlaceOfBirth());
+        assertNull(jackSafeBox.getVault().getPassports().getFirst().getDateOfBirth());
+        assertNull(jackSafeBox.getVault().getPassports().getFirst().getIssueDate());
+        assertNull(jackSafeBox.getVault().getPassports().getFirst().getExpiryDate());
+
+        EditPassportRequest editPassportRequest = new EditPassportRequest();
+        editPassportRequest.setUsername("jack123");
+        editPassportRequest.setTitle("my personal passport");
+        editPassportRequest.setUpdatedNationality("british");
+        editPassportRequest.setUpdatedPlaceOfBirth("london");
+        editPassportRequest.setUpdatedDateOfBirth("");
+        editPassportRequest.setUpdatedExpiryDate("");
+        editPassportRequest.setUpdatedIssueDate("");
+        editPassportRequest.setUpdatedExpiryDate("");
+
+        jackSafeBox = userRepository.findByUsername("jack123");
+        assertEquals(1, passportRepository.count());
+        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
+        assertEquals(1, jackSafeBox.getVault().getPassports().size());
+        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
+        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
+        assertEquals("", jackSafeBox.getVault().getPassports().getFirst().getIssueDate());
+        assertEquals("", jackSafeBox.getVault().getPassports().getFirst().getExpiryDate());
+    }
+
+    @Test
+    public void userViewsPassportTest() {
+        assertEquals(0, userRepository.count());
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(1, userRepository.count());
+        assertEquals("jack123", jackRegisterResponse.getUsername());
+
+        SavePassportRequest savePassportRequest = new SavePassportRequest();
+        savePassportRequest.setUsername("jack123");
+        savePassportRequest.setTitle("my personal passport");
+        savePassportRequest.setSurname("smith");
+        savePassportRequest.setGivenNames("john scott");
+        savePassportRequest.setNationality("british");
+        savePassportRequest.setPlaceOfBirth("london");
+        savePassportRequest.setDateOfBirth("");
+        savePassportRequest.setPassportNumber("533401372");
+        savePassportRequest.setIssueDate("");
+        savePassportRequest.setExpiryDate("");
+        SavePassportResponse jackSavePassportResponse = userService.savePassport(savePassportRequest);
+
+        User jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(1, passportRepository.count());
+        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
+        assertEquals(1, jackSafeBox.getVault().getPassports().size());
+        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
+        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
+
+        ViewPassportRequest viewPassportRequest = new ViewPassportRequest();
+        viewPassportRequest.setUsername("jack123");
+        viewPassportRequest.setTitle("my personal passport");
+        ViewPassportResponse viewPassportResponse = userService.viewPassport(viewPassportRequest);
+
+    }
+
+    @Test
+    public void deletePassportTest() {
+        assertEquals(0, userRepository.count());
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(1, userRepository.count());
+        assertEquals("jack123", jackRegisterResponse.getUsername());
+
+        SavePassportRequest savePassportRequest = new SavePassportRequest();
+        savePassportRequest.setUsername("jack123");
+        savePassportRequest.setTitle("my personal passport");
+        savePassportRequest.setSurname("smith");
+        savePassportRequest.setGivenNames("john scott");
+        savePassportRequest.setNationality("british");
+        savePassportRequest.setPlaceOfBirth("london");
+        savePassportRequest.setDateOfBirth("");
+        savePassportRequest.setPassportNumber("533401372");
+        savePassportRequest.setIssueDate("");
+        savePassportRequest.setExpiryDate("");
+        SavePassportResponse jackSavePassportResponse = userService.savePassport(savePassportRequest);
+
+        User jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(1, passportRepository.count());
+        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
+        assertEquals(1, jackSafeBox.getVault().getPassports().size());
+        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
+        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
+
+        DeletePassportRequest deletePassportRequest = new DeletePassportRequest();
+        deletePassportRequest.setTitle("my personal passport");
+        deletePassportRequest.setUsername("jack123");
+        deletePassportRequest.setMasterPassword("Password123.");
+        DeletePassportResponse jackDeletePassportResponse = userService.deletePassport(deletePassportRequest);
+
+        jackSafeBox = userRepository.findByUsername("jack123");
+
+        assertEquals(0, passportRepository.count());
+        assertEquals(0, vaultRepository.findAll().getFirst().getPassports().size());
+        assertEquals(0, jackSafeBox.getVault().getPassports().size());
+        assertEquals("my personal passport", jackDeletePassportResponse.getTitle());
+    }
+
+
 
 }

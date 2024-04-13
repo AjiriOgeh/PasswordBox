@@ -1,9 +1,6 @@
 package com.passwordbox.utilities;
 
-import com.passwordbox.data.models.LoginInfo;
-import com.passwordbox.data.models.Note;
-import com.passwordbox.data.models.User;
-import com.passwordbox.data.models.Vault;
+import com.passwordbox.data.models.*;
 import com.passwordbox.dataTransferObjects.requests.*;
 import com.passwordbox.dataTransferObjects.responses.*;
 
@@ -151,5 +148,81 @@ public class Mappers {
         generatePinResponse.setPin(pin);
         generatePinResponse.setLength(pin.length());
         return generatePinResponse;
+    }
+
+    public static CreditCard saveCreditCardRequestMap(SaveCreditCardRequest saveCreditCardRequest) {
+        CreditCard creditCard = new CreditCard();
+        creditCard.setTitle(saveCreditCardRequest.getTitle());
+        creditCard.setCardNumber(saveCreditCardRequest.getCardNumber());
+        creditCard.setCardType(saveCreditCardRequest.getCardType());
+        creditCard.setCVV(saveCreditCardRequest.getCVV());
+        creditCard.setAdditionalInformation(saveCreditCardRequest.getAdditionalInformation());
+        return creditCard;
+    }
+
+    public static SaveCreditCardResponse saveCreditCardResponseMap(CreditCard creditCard) {
+        SaveCreditCardResponse saveCreditCardResponse = new SaveCreditCardResponse();
+        saveCreditCardResponse.setId(creditCard.getId());
+        saveCreditCardResponse.setTitle(creditCard.getTitle());
+        saveCreditCardResponse.setCreditCardNumber(creditCard.getCardNumber());
+        return saveCreditCardResponse;
+    }
+
+    public static CreditCard editCreditCardRequestMap(EditCreditCardRequest editCreditCardRequest, CreditCard creditCard) {
+        if (editCreditCardRequest.getUpdateTitle() != null) creditCard.setTitle(editCreditCardRequest.getUpdateTitle());
+        if (editCreditCardRequest.getUpdatedCardNumber() != null) creditCard.setCardNumber(editCreditCardRequest.getUpdatedCardNumber());
+        if (editCreditCardRequest.getUpdatedPin() != null) creditCard.setPin(editCreditCardRequest.getUpdatedPin());
+        if (editCreditCardRequest.getUpdatedAdditionalInformation() != null) creditCard.setAdditionalInformation(editCreditCardRequest.getUpdatedAdditionalInformation());
+        if (editCreditCardRequest.getUpdatedCVV() != null) creditCard.setCVV(editCreditCardRequest.getUpdatedCVV());
+        if (editCreditCardRequest.getUpdatedExpiryDate() != null) creditCard.setExpiryDate(editCreditCardRequest.getUpdatedExpiryDate());
+        return creditCard;
+    }
+
+    public static EditCreditCardResponse editCreditCardResponseMap(CreditCard creditCard) {
+        EditCreditCardResponse editCreditCardResponse = new EditCreditCardResponse();
+        editCreditCardResponse.setId(creditCard.getId());
+        editCreditCardResponse.setTitle(creditCard.getTitle());
+        return editCreditCardResponse;
+    }
+
+    public static ViewCreditCardResponse viewCreditCardResponseMap(CreditCard creditCard) {
+        ViewCreditCardResponse viewCreditCardResponse = new ViewCreditCardResponse();
+        viewCreditCardResponse.setId(creditCard.getId());
+        viewCreditCardResponse.setTitle(creditCard.getTitle());
+        return viewCreditCardResponse;
+    }
+
+    public static DeleteCreditCardResponse deleteCreditCardResponseMap(CreditCard creditCard) {
+        DeleteCreditCardResponse deleteCreditCardResponse = new DeleteCreditCardResponse();
+        deleteCreditCardResponse.setId(creditCard.getId());
+        deleteCreditCardResponse.setTitle(creditCard.getTitle());
+        return deleteCreditCardResponse;
+    }
+
+    public static Passport savePassportRequestMap(SavePassportRequest savePassportRequest) {
+        Passport passport = new Passport();
+        passport.setTitle(savePassportRequest.getTitle());
+        passport.setPassportNumber(savePassportRequest.getPassportNumber());
+        passport.setDateOfBirth(savePassportRequest.getDateOfBirth());
+        passport.setNationality(savePassportRequest.getNationality());
+        passport.setSurname(savePassportRequest.getSurname());
+        passport.setGivenNames(savePassportRequest.getGivenNames());
+        passport.setIssueDate(savePassportRequest.getIssueDate());
+        passport.setExpiryDate(savePassportRequest.getExpiryDate());
+        return passport;
+    }
+
+    public static SavePassportResponse savePassportResponseMap(Passport passport) {
+        SavePassportResponse savePassportResponse = new SavePassportResponse();
+        savePassportResponse.setId(passport.getId());
+        savePassportResponse.setTitle(passport.getTitle());
+        return savePassportResponse;
+    }
+
+    public static DeletePassportResponse deletePassportResponseMap(Passport passport) {
+        DeletePassportResponse deletePassportResponse = new DeletePassportResponse();
+        deletePassportResponse.setId(passport.getId());
+        deletePassportResponse.setTitle(passport.getTitle());
+        return deletePassportResponse;
     }
 }

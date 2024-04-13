@@ -29,4 +29,18 @@ public interface UserService {
     GeneratePasswordResponse generatePassword(GeneratePasswordRequest generatePasswordRequest);
 
     GeneratePinResponse generatePin(GeneratePinRequest generatePinRequest);
+
+    SaveCreditCardResponse saveCreditCard(SaveCreditCardRequest saveCreditCardRequest);
+
+    EditCreditCardResponse editCreditCard(EditCreditCardRequest editCreditCardRequest);
+
+    ViewCreditCardResponse viewCreditCard(ViewCreditCardRequest viewCreditCardRequest);
+
+    DeleteCreditCardResponse deleteCreditCard(DeleteCreditCardRequest deleteCreditCardRequest);
+
+    SavePassportResponse savePassport(SavePassportRequest savePassportRequest);
+
+    ViewPassportResponse viewPassport(ViewPassportRequest viewPassportRequest);
+
+    DeletePassportResponse deletePassport(DeletePassportRequest deletePassportRequest);
 }
