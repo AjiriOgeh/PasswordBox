@@ -8,9 +8,9 @@ import com.passwordbox.dataTransferObjects.requests.SaveNewLoginInfoRequest;
 import com.passwordbox.dataTransferObjects.responses.DeleteLoginInfoResponse;
 
 public interface LoginInfoService {
-    LoginInfo saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault);
+    LoginInfo saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault) throws Exception;
 
-    LoginInfo editLoginInfo(EditLoginInfoRequest editLoginInfoRequest, Vault vault);
+    LoginInfo editLoginInfo(EditLoginInfoRequest editLoginInfoRequest, Vault vault) throws Exception;
 
     DeleteLoginInfoResponse deleteLoginInfo(DeleteLoginInfoRequest deleteLoginInfoRequest, Vault vault);
 }

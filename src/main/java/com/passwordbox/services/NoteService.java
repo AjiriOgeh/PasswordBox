@@ -10,7 +10,7 @@ import com.passwordbox.dataTransferObjects.responses.DeleteNoteResponse;
 public interface NoteService {
     Note createNote(CreateNoteRequest createNoteRequest, Vault vault);
 
-    Note editNote(EditNoteRequest editNoteRequest, Vault vault);
+    Note editNote(EditNoteRequest editNoteRequest, Vault vault) throws Exception;
 
     DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest, Vault vault);
 }

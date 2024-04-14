@@ -20,7 +20,7 @@ public class LoginInfoServiceImplementation implements LoginInfoService {
     @Autowired
     private LoginInfoRepository loginInfoRepository;
     @Override
-    public LoginInfo saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault) {
+    public LoginInfo saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault) throws Exception {
         validateLoginInfoTitle(saveNewLoginInfoRequest.getTitle(), vault);
         LoginInfo loginInfo = saveNewLoginInfoRequestMap(saveNewLoginInfoRequest);
         loginInfoRepository.save(loginInfo);
@@ -28,7 +28,7 @@ public class LoginInfoServiceImplementation implements LoginInfoService {
     }
 
     @Override
-    public LoginInfo editLoginInfo(EditLoginInfoRequest editLoginInfoRequest, Vault vault) {
+    public LoginInfo editLoginInfo(EditLoginInfoRequest editLoginInfoRequest, Vault vault) throws Exception {
         LoginInfo loginInfo = findLoginInfoInVault(editLoginInfoRequest.getTitle().toLowerCase(), vault);
         validateLoginInfoTitle(editLoginInfoRequest.getEditedTitle(), vault);
         LoginInfo updatedLoginInfo = editLoginInfoRequestMap(editLoginInfoRequest, loginInfo);

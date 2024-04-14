@@ -2,6 +2,7 @@ package com.passwordbox.controllers;
 
 import com.passwordbox.dataTransferObjects.requests.*;
 import com.passwordbox.dataTransferObjects.responses.ApiResponse;
+import com.passwordbox.dataTransferObjects.responses.ViewCreditCardResponse;
 import com.passwordbox.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -127,9 +128,9 @@ public class UserController {
     public ResponseEntity<?> generatePassword(@RequestBody GeneratePasswordRequest generatePasswordRequest) {
         try {
             return new ResponseEntity<>(new ApiResponse(true, userService.generatePassword(generatePasswordRequest)), HttpStatus.CREATED);
-        } catch (Exception error) {
+        }
+        catch (Exception error) {
             return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
-
         }
     }
 
@@ -137,7 +138,48 @@ public class UserController {
     public ResponseEntity<?> generatePin(@RequestBody GeneratePinRequest generatePinRequest) {
         try {
             return new ResponseEntity<>(new ApiResponse(true, userService.generatePin(generatePinRequest)), HttpStatus.CREATED);
-        } catch (Exception error) {
+        }
+        catch (Exception error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/SaveCreditCard")
+    public ResponseEntity<?> saveCreditCard(@RequestBody SaveCreditCardRequest saveCreditCardRequest) {
+        try {
+            return new ResponseEntity<>(new ApiResponse(true, userService.saveCreditCard(saveCreditCardRequest)), HttpStatus.CREATED);
+        }
+        catch (Exception error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PatchMapping("/EditCreditCard")
+    public ResponseEntity<?> editCreditCard(@RequestBody EditCreditCardRequest editCreditCardRequest) {
+        try {
+            return new ResponseEntity<>(new ApiResponse(true, userService.editCreditCard(editCreditCardRequest)), HttpStatus.OK);
+        }
+        catch (Exception error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/ViewCreditCard")
+    public ResponseEntity<?> viewCreditCard(@RequestBody ViewCreditCardRequest viewCreditCardRequest) {
+        try {
+            return new ResponseEntity<>(new ApiResponse(true, userService.viewCreditCard(viewCreditCardRequest)), HttpStatus.OK);
+        }
+        catch (Exception error) {
+            return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/DeleteCreditCard")
+    public ResponseEntity<?> deleteCreditCard(@RequestBody DeleteCreditCardRequest deleteCreditCardRequest) {
+        try {
+            return new ResponseEntity<>(new ApiResponse(true, userService.deleteCreditCard(deleteCreditCardRequest)), HttpStatus.OK);
+        }
+        catch (Exception error) {
             return new ResponseEntity<>(new ApiResponse(false, error.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }

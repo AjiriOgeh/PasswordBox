@@ -9,9 +9,9 @@ import com.passwordbox.dataTransferObjects.responses.DeleteCreditCardResponse;
 
 public interface CreditCardService {
 
-    CreditCard saveCreditCard(SaveCreditCardRequest saveCreditCardRequest);
+    CreditCard saveCreditCard(SaveCreditCardRequest saveCreditCardRequest, Vault vault) throws Exception;
 
-    CreditCard editCreditCard(EditCreditCardRequest editCreditCardRequest, Vault vault);
+    CreditCard editCreditCard(EditCreditCardRequest editCreditCardRequest, Vault vault) throws Exception;
 
     DeleteCreditCardResponse deleteCreditCard(DeleteCreditCardRequest deleteCreditCardRequest, Vault vault);
 }

@@ -10,19 +10,19 @@ public interface UserService {
 
     LoginResponse login(LoginRequest loginRequest);
 
-    SaveNewLoginInfoResponse saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest);
+    SaveNewLoginInfoResponse saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest) throws Exception;
 
-    EditLoginInfoResponse editLoginInfo(EditLoginInfoRequest editLoginInfoRequest);
+    EditLoginInfoResponse editLoginInfo(EditLoginInfoRequest editLoginInfoRequest) throws Exception;
 
-    ViewLoginInfoResponse viewLoginInfo(ViewLoginInfoRequest viewLoginInfoRequest);
+    ViewLoginInfoResponse viewLoginInfo(ViewLoginInfoRequest viewLoginInfoRequest) throws Exception;
 
     DeleteLoginInfoResponse deleteLoginInfo(DeleteLoginInfoRequest deleteLoginInfoRequest);
 
-    CreateNoteResponse createNote(CreateNoteRequest createNoteRequest);
+    CreateNoteResponse createNote(CreateNoteRequest createNoteRequest) throws Exception;
 
-    EditNoteResponse editNote(EditNoteRequest editNoteRequest);
+    EditNoteResponse editNote(EditNoteRequest editNoteRequest) throws Exception;
 
-    ViewNoteResponse viewNote(ViewNoteRequest viewNoteRequest);
+    ViewNoteResponse viewNote(ViewNoteRequest viewNoteRequest) throws Exception;
 
     DeleteNoteResponse deleteNote(DeleteNoteRequest deleteNoteRequest);
 
@@ -30,17 +30,13 @@ public interface UserService {
 
     GeneratePinResponse generatePin(GeneratePinRequest generatePinRequest);
 
-    SaveCreditCardResponse saveCreditCard(SaveCreditCardRequest saveCreditCardRequest);
+    SaveCreditCardResponse saveCreditCard(SaveCreditCardRequest saveCreditCardRequest) throws Exception;
 
-    EditCreditCardResponse editCreditCard(EditCreditCardRequest editCreditCardRequest);
+    EditCreditCardResponse editCreditCard(EditCreditCardRequest editCreditCardRequest) throws Exception;
 
-    ViewCreditCardResponse viewCreditCard(ViewCreditCardRequest viewCreditCardRequest);
+    ViewCreditCardResponse viewCreditCard(ViewCreditCardRequest viewCreditCardRequest) throws Exception;
 
     DeleteCreditCardResponse deleteCreditCard(DeleteCreditCardRequest deleteCreditCardRequest);
 
-    SavePassportResponse savePassport(SavePassportRequest savePassportRequest);
 
-    ViewPassportResponse viewPassport(ViewPassportRequest viewPassportRequest);
-
-    DeletePassportResponse deletePassport(DeletePassportRequest deletePassportRequest);
 }

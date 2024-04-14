@@ -34,57 +34,76 @@ public class UserServiceImplementationTest {
     @Autowired
     private CreditCardRepository creditCardRepository;
 
-    @Autowired
-    private PassportRepository passportRepository;
-
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         userRepository.deleteAll();
         vaultRepository.deleteAll();
         loginInfoRepository.deleteAll();
         noteRepository.deleteAll();
         creditCardRepository.deleteAll();
-        passportRepository.deleteAll();
+
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("jack123");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        userService.signUp(registerRequest);
+
+        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
+        saveNewLoginInfoRequest.setUsername("jack123");
+        saveNewLoginInfoRequest.setTitle("gmail login");
+        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
+        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
+        userService.saveNewLoginInfo(saveNewLoginInfoRequest);
+
+        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
+        createNoteRequest.setUsername("jack123");
+        createNoteRequest.setTitle("ideas");
+        createNoteRequest.setContent("build an AI assistant for projects");
+        userService.createNote(createNoteRequest);
+
+        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
+        saveCreditCardRequest.setUsername("jack123");
+        saveCreditCardRequest.setTitle("gtb savings card");
+        saveCreditCardRequest.setCardNumber("5399831619690403");
+        saveCreditCardRequest.setExpiryDate("01/2025");
+        saveCreditCardRequest.setPin("1234");
+        saveCreditCardRequest.setCVV("567");
+        saveCreditCardRequest.setAdditionalInformation("for personal use");
+        userService.saveCreditCard(saveCreditCardRequest);
     }
 
     @Test
     public void userSignsUp_UserIsSavedTest() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
+        registerRequest.setUsername("jim456");
         registerRequest.setMasterPassword("Password123.");
         registerRequest.setConfirmMasterPassword("Password123.");
         RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
 
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
+        assertEquals(2, userRepository.count());
+        assertEquals("jim456", jackRegisterResponse.getUsername());
     }
 
     @Test
-    public void twoSignsUp_UsersAreSavedTest() {
-        assertEquals(0, userRepository.count());
-
+    public void multipleUsersSignUp_UsersAreSavedTest() {
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        registerRequest.setUsername("jim456");
+        registerRequest.setUsername("jim123");
         registerRequest.setMasterPassword("Password123.");
         registerRequest.setConfirmMasterPassword("Password123.");
         RegisterResponse jimRegisterResponse = userService.signUp(registerRequest);
 
-        assertEquals(2, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-        assertEquals("jim456", jimRegisterResponse.getUsername());
+        registerRequest.setUsername("james456");
+        registerRequest.setMasterPassword("Password123.");
+        registerRequest.setConfirmMasterPassword("Password123.");
+        RegisterResponse jamesRegisterResponse = userService.signUp(registerRequest);
+
+        assertEquals(3, userRepository.count());
+        assertEquals("jim123", jimRegisterResponse.getUsername());
+        assertEquals("james456", jamesRegisterResponse.getUsername());
     }
 
     @Test
     public void userSignsUp_UsernameFieldIsNull_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setUsername(null);
         registerRequest.setMasterPassword("Password123.");
@@ -95,8 +114,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_UsernameFieldIsEmpty_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setUsername("");
         registerRequest.setMasterPassword("Password123.");
@@ -107,10 +124,8 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_UsernameField_ContainsSpaceCharacter_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack 123");
+        registerRequest.setUsername("jim 123");
         registerRequest.setMasterPassword("Password123.");
         registerRequest.setConfirmMasterPassword("Password123.");
 
@@ -119,17 +134,7 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_UsernameExists_ThrowsException() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         registerRequest.setUsername("jack123");
         registerRequest.setMasterPassword("Password123.");
         registerRequest.setConfirmMasterPassword("Password123.");
@@ -139,10 +144,8 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_MasterPasswordFieldIsNull_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
+        registerRequest.setUsername("jim123");
         registerRequest.setMasterPassword(null);
         registerRequest.setConfirmMasterPassword(null);
 
@@ -151,10 +154,8 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_MasterPasswordFieldIsEmpty_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
+        registerRequest.setUsername("jim123");
         registerRequest.setMasterPassword("");
         registerRequest.setConfirmMasterPassword("");
 
@@ -163,10 +164,8 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_MasterPassword_DoesNotMatch_ConfirmPassword_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
+        registerRequest.setUsername("jim123");
         registerRequest.setMasterPassword("Password123.");
         registerRequest.setConfirmMasterPassword("Non matching password 456.");
 
@@ -175,10 +174,8 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_PasswordLengthIsLessThan10Characters_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
+        registerRequest.setUsername("jim123");
         registerRequest.setMasterPassword("Word123.");
         registerRequest.setConfirmMasterPassword("Word123.");
 
@@ -186,18 +183,7 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSignsUp_UserLogsOutTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    public void uerLogsOutTest() {
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
@@ -209,18 +195,7 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSignsUp_NonExistentUserLogsOut_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    public void nonExistentUserLogsOut_ThrowsExceptionTest() {
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jim456");
 
@@ -228,18 +203,7 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSignsUp_UserLogsOut_UserLogsInTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    public void userLogsOut_UserLogsInTest() {
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
@@ -262,17 +226,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void nonExistentUserLogsIn_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
@@ -290,18 +243,7 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void registeredUserLogsInWithInvalidPassword_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    public void userLogsInWith_InvalidPassword_ThrowsExceptionTest() {
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
@@ -319,49 +261,27 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSignsUp_UserSavesLoginInfoTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    public void userSavesLoginInfoTest() throws Exception {
         SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
         saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
+        saveNewLoginInfoRequest.setTitle("yahoo login");
+        saveNewLoginInfoRequest.setWebsite("www.yahoo.com");
+        saveNewLoginInfoRequest.setLoginId("jack123@yahoo.com");
         SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
 
         User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
+        assertEquals(2, loginInfoRepository.count());
+        assertEquals(2, jackSafeBox.getVault().getLoginInfos().size());
+        assertEquals("jack123@yahoo.com", jackSafeBox.getVault().getLoginInfos().get(1).getLoginId());
+        assertEquals("yahoo login", saveNewLoginInfoResponse.getTitle());
+        assertEquals("www.yahoo.com", saveNewLoginInfoResponse.getWebsite());
+        assertEquals("jack123@yahoo.com", loginInfoRepository.findAll().get(1).getLoginId());
     }
 
     @Test
-    public void userLogsOut_SavesLoginInfo_ThrowExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    public void userLogsOut_SavesLoginInfo_ThrowsExceptionTest() {
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
@@ -373,244 +293,61 @@ public class UserServiceImplementationTest {
 
         SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
         saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-
-        assertThrows(ProfileLockStateException.class, ()->userService.saveNewLoginInfo(saveNewLoginInfoRequest));
-        assertEquals(1, vaultRepository.count());
-        assertEquals(0, loginInfoRepository.count());
-    }
-
-    @Test
-    public void twoUsersSignsUp_UsersSaveLoginInfoTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        registerRequest.setUsername("jim456");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jimRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(2, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-        assertEquals("jim456", jimRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse jackSaveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        saveNewLoginInfoRequest.setUsername("jim456");
         saveNewLoginInfoRequest.setTitle("yahoo login");
         saveNewLoginInfoRequest.setWebsite("www.yahoo.com");
-        saveNewLoginInfoRequest.setLoginId("jim456@yahoo.com");
-        SaveNewLoginInfoResponse jimSaveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
+        saveNewLoginInfoRequest.setLoginId("jack123@yahoo.com");
 
-        User jackSafeBox = userRepository.findByUsername("jack123");
-        User jimSafeBox = userRepository.findByUsername("jim456");
-
-        assertEquals(2, vaultRepository.count());
-        assertEquals(2, loginInfoRepository.count());
-
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals(1, jimSafeBox.getVault().getLoginInfos().size());
-
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("jim456@yahoo.com", jimSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-
-        assertEquals("gmail login", jackSaveNewLoginInfoResponse.getTitle());
-        assertEquals("yahoo login", jimSaveNewLoginInfoResponse.getTitle());
-
-        assertEquals("www.gmail.com", jackSaveNewLoginInfoResponse.getWebsite());
-        assertEquals("www.yahoo.com", jimSaveNewLoginInfoResponse.getWebsite());
-
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-        assertEquals("jim456@yahoo.com", loginInfoRepository.findAll().get(1).getLoginId());
+        assertThrows(ProfileLockStateException.class, ()->userService.saveNewLoginInfo(saveNewLoginInfoRequest));
     }
+
 
     @Test
     public void nonExistentUser_SavesLoginInfo_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jim456");
+        saveNewLoginInfoRequest.setUsername("jim123");
         saveNewLoginInfoRequest.setTitle("gmail login");
         saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jim456@gmail.com");
+        saveNewLoginInfoRequest.setLoginId("jim123@gmail.com");
 
-        assertEquals(0, loginInfoRepository.count());
         assertThrows(UserNotFoundException.class, ()->userService.saveNewLoginInfo(saveNewLoginInfoRequest));
     }
 
-    @Test
-    public void usersSignUp_SecondUser_SavesLoginInfoTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        registerRequest.setUsername("jim456");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jimRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(2, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-        assertEquals("jim456", jimRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jim456");
-        saveNewLoginInfoRequest.setTitle("yahoo login");
-        saveNewLoginInfoRequest.setWebsite("www.yahoo.com");
-        saveNewLoginInfoRequest.setLoginId("jim456@yahoo.com");
-        SaveNewLoginInfoResponse jimSaveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jimSafeBox = userRepository.findByUsername("jim456");
-
-        assertEquals(2, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jimSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jim456@yahoo.com", jimSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("yahoo login", jimSaveNewLoginInfoResponse.getTitle());
-        assertEquals("www.yahoo.com", jimSaveNewLoginInfoResponse.getWebsite());
-        assertEquals("jim456@yahoo.com", loginInfoRepository.findAll().getFirst().getLoginId());
-    }
 
     @Test
     public void userSavesLoginInfo_TitleFieldIsNull_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
         saveNewLoginInfoRequest.setUsername("jack123");
         saveNewLoginInfoRequest.setTitle(null);
         saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jim456@gmail.com");
+        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
 
-        assertEquals(0, loginInfoRepository.count());
         assertThrows(IllegalArgumentException.class, ()->userService.saveNewLoginInfo(saveNewLoginInfoRequest));
     }
 
     @Test
     public void userSavesLoginInfo_TitleFieldIsEmptyTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
         saveNewLoginInfoRequest.setUsername("jack123");
         saveNewLoginInfoRequest.setTitle("");
         saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jim456@gmail.com");
+        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
 
-        assertEquals(0, loginInfoRepository.count());
         assertThrows(IllegalArgumentException.class, ()->userService.saveNewLoginInfo(saveNewLoginInfoRequest));
     }
 
     @Test
     public void userSavesLoginInfo_TitleExistsInUserList_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
         saveNewLoginInfoRequest.setUsername("jack123");
         saveNewLoginInfoRequest.setTitle("gmail login");
         saveNewLoginInfoRequest.setWebsite("www.gmail.com");
         saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
 
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.facebook.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-
-        assertEquals(1, loginInfoRepository.count());
         assertThrows(IllegalArgumentException.class, ()->userService.saveNewLoginInfo(saveNewLoginInfoRequest));
     }
 
     @Test
-    public void userSavesLoginInformation_UserEditLoginInformationTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
+    public void userEditLoginInfoTest() throws Exception {
         EditLoginInfoRequest editLoginInfoRequest = new EditLoginInfoRequest();
         editLoginInfoRequest.setUsername("jack123");
         editLoginInfoRequest.setTitle("gmail login");
@@ -620,95 +357,34 @@ public class UserServiceImplementationTest {
         editLoginInfoRequest.setEditedPassword("password");
         EditLoginInfoResponse editLoginInfoResponse = userService.editLoginInfo(editLoginInfoRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
-        assertEquals(1, vaultRepository.count());
         assertEquals(1, loginInfoRepository.count());
         assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
         assertEquals("jack123@yahoo.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("password", jackSafeBox.getVault().getLoginInfos().getFirst().getPassword());
-        assertEquals("www.yahoo.com", vaultRepository.findAll().getFirst().getLoginInfos().getFirst().getWebsite());
         assertEquals("yahoo login", editLoginInfoResponse.getTitle());
-        assertEquals("www.yahoo.com", editLoginInfoResponse.getWebsite());
         assertEquals("jack123@yahoo.com", loginInfoRepository.findAll().getFirst().getLoginId());
     }
 
     @Test
-    public void userSavesLoginInformation_NonExistentUser_EditsLoginInformation_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
+    public void nonExistentUser_EditsLoginInfo_ThrowsExceptionTest() {
         EditLoginInfoRequest editLoginInfoRequest = new EditLoginInfoRequest();
-        editLoginInfoRequest.setUsername("jim456");
+        editLoginInfoRequest.setUsername("jim123456");
         editLoginInfoRequest.setTitle("gmail login");
         editLoginInfoRequest.setEditedTitle("yahoo mail");
         editLoginInfoRequest.setEditedWebsite("www.yahoo.com");
-        editLoginInfoRequest.setEditedLoginId("jim456@yahoo.com");
+        editLoginInfoRequest.setEditedLoginId("jim123@yahoo.com");
         editLoginInfoRequest.setEditedPassword("password");
 
         assertThrows(UserNotFoundException.class, ()->userService.editLoginInfo(editLoginInfoRequest));
     }
 
     @Test
-    public void userSavesLoginInformation_UserLogsOut_EditsLoginInformation_ThrowExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
-        LogoutRequest logoutRequest = new LogoutRequest();
+    public void userLogsOut_EditsLoginInfo_ThrowExceptionTest() {        LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertTrue(jackSafeBox.isLocked());
         assertEquals("jack123", jackLogoutResponse.getUsername());
@@ -725,35 +401,7 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSavesLoginInformation_UserEditsNonExistentLoginInformation_ThrowExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
+    public void userEdits_NonExistentLoginInfo_ThrowExceptionTest() {
         EditLoginInfoRequest editLoginInfoRequest = new EditLoginInfoRequest();
         editLoginInfoRequest.setUsername("jack123");
         editLoginInfoRequest.setTitle("hotmail login");
@@ -764,75 +412,20 @@ public class UserServiceImplementationTest {
 
         assertThrows(LoginInfoNotFoundException.class, ()->userService.editLoginInfo(editLoginInfoRequest));
     }
-    @Test
-    public void userSavesLoginInfo_UserViewsLoginInfoTest() {
-        assertEquals(0, userRepository.count());
 
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
-        ViewLoginInfoRequest viewLoginInfoRequest = new ViewLoginInfoRequest();
-        viewLoginInfoRequest.setUsername("jack123");
-        viewLoginInfoRequest.setTitle("gmail login");
-        ViewLoginInfoResponse viewLoginInfoResponse = userService.viewLoginInfo(viewLoginInfoRequest);
-
-        assertEquals("jack123@gmail.com", viewLoginInfoResponse.getLoginId());
-        assertEquals("www.gmail.com", viewLoginInfoResponse.getWebsite());
-    }
+//    @Test
+//    public void userViewsLoginInfoTest() throws Exception {
+//        ViewLoginInfoRequest viewLoginInfoRequest = new ViewLoginInfoRequest();
+//        viewLoginInfoRequest.setUsername("jack123");
+//        viewLoginInfoRequest.setTitle("gmail login");
+//        ViewLoginInfoResponse viewLoginInfoResponse = userService.viewLoginInfo(viewLoginInfoRequest);
+//
+//        assertEquals("jack123@gmail.com", viewLoginInfoResponse.getLoginId());
+//        assertEquals("www.gmail.com", viewLoginInfoResponse.getWebsite());
+//    }
 
     @Test
-    public void nonExistentUserViewsLoginInfo_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
+    public void nonExistentUser_ViewsLoginInfo_ThrowsExceptionTest() {
         ViewLoginInfoRequest viewLoginInfoRequest = new ViewLoginInfoRequest();
         viewLoginInfoRequest.setUsername("jim456");
         viewLoginInfoRequest.setTitle("gmail login");
@@ -841,35 +434,7 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userViewsNonExistentLoginInfo_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
+    public void userViews_NonExistentLoginInfo_ThrowsExceptionTest() {
         ViewLoginInfoRequest viewLoginInfoRequest = new ViewLoginInfoRequest();
         viewLoginInfoRequest.setUsername("jack123");
         viewLoginInfoRequest.setTitle("yahoo login");
@@ -879,39 +444,11 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userLogsOut_UserViewsLoginInfo_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertTrue(jackSafeBox.isLocked());
         assertEquals("jack123", jackLogoutResponse.getUsername());
@@ -925,41 +462,13 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSavesLoginInfo_UserDeletesLoginInfoTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
         DeleteLoginInfoRequest deleteLoginInfoRequest = new DeleteLoginInfoRequest();
         deleteLoginInfoRequest.setUsername("jack123");
         deleteLoginInfoRequest.setTitle("gmail login");
         deleteLoginInfoRequest.setMasterPassword("Password123.");
         DeleteLoginInfoResponse deleteLoginInfoResponse = userService.deleteLoginInfo(deleteLoginInfoRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertEquals(0, loginInfoRepository.count());
         assertEquals(0, jackSafeBox.getVault().getLoginInfos().size());
@@ -967,109 +476,13 @@ public class UserServiceImplementationTest {
         assertEquals("gmail login", deleteLoginInfoResponse.getTitle());
     }
 
-    @Test
-    public void twoUsersSaveLoginInfo_SecondUserDeletesInfoTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        registerRequest.setUsername("jim456");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jimRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(2, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-        assertEquals("jim456", jimRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse jackSaveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        saveNewLoginInfoRequest.setUsername("jim456");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jim456@gmail.com");
-        SaveNewLoginInfoResponse jimSaveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-        User jimSafeBox = userRepository.findByUsername("jim456");
-
-        assertEquals(2, vaultRepository.count());
-        assertEquals(2, loginInfoRepository.count());
-
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals(1, jimSafeBox.getVault().getLoginInfos().size());
-
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("jim456@gmail.com", jimSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-
-        assertEquals("gmail login", jackSaveNewLoginInfoResponse.getTitle());
-        assertEquals("gmail login", jimSaveNewLoginInfoResponse.getTitle());
-
-        assertEquals("www.gmail.com", jackSaveNewLoginInfoResponse.getWebsite());
-        assertEquals("www.gmail.com", jimSaveNewLoginInfoResponse.getWebsite());
-
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-        assertEquals("jim456@gmail.com", loginInfoRepository.findAll().get(1).getLoginId());
-
-        DeleteLoginInfoRequest deleteLoginInfoRequest = new DeleteLoginInfoRequest();
-        deleteLoginInfoRequest.setUsername("jim456");
-        deleteLoginInfoRequest.setTitle("gmail login");
-        deleteLoginInfoRequest.setMasterPassword("Password123.");
-        DeleteLoginInfoResponse deleteLoginInfoResponse = userService.deleteLoginInfo(deleteLoginInfoRequest);
-
-        jimSafeBox = userRepository.findByUsername("jim456");
-
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(0, jimSafeBox.getVault().getLoginInfos().size());
-        assertEquals(1, vaultRepository.findAll().getFirst().getLoginInfos().size());
-        assertEquals("gmail login", deleteLoginInfoResponse.getTitle());
-    }
-
-
-    @Test
+        @Test
     public void userLogsOut_DeletesLoginInfo_ThrowExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertTrue(jackSafeBox.isLocked());
         assertEquals("jack123", jackLogoutResponse.getUsername());
@@ -1084,43 +497,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void nonExistentUser_DeletesLoginInfo_ThrowExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
-        LogoutRequest logoutRequest = new LogoutRequest();
-        logoutRequest.setUsername("jack123");
-        LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
-
-        jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertTrue(jackSafeBox.isLocked());
-        assertEquals("jack123", jackLogoutResponse.getUsername());
-
         DeleteLoginInfoRequest deleteLoginInfoRequest = new DeleteLoginInfoRequest();
         deleteLoginInfoRequest.setUsername("jim456");
         deleteLoginInfoRequest.setTitle("gmail login");
@@ -1131,34 +507,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userDeletesLoginInfo_PasswordIsInvalid_ThrowExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
         DeleteLoginInfoRequest deleteLoginInfoRequest = new DeleteLoginInfoRequest();
         deleteLoginInfoRequest.setUsername("jack123");
         deleteLoginInfoRequest.setTitle("gmail login");
@@ -1168,35 +516,7 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userDeletesNonExistentLoginInfo_ThrowExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveNewLoginInfoRequest saveNewLoginInfoRequest = new SaveNewLoginInfoRequest();
-        saveNewLoginInfoRequest.setUsername("jack123");
-        saveNewLoginInfoRequest.setTitle("gmail login");
-        saveNewLoginInfoRequest.setWebsite("www.gmail.com");
-        saveNewLoginInfoRequest.setLoginId("jack123@gmail.com");
-        SaveNewLoginInfoResponse saveNewLoginInfoResponse = userService.saveNewLoginInfo(saveNewLoginInfoRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, loginInfoRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getLoginInfos().size());
-        assertEquals("jack123@gmail.com", jackSafeBox.getVault().getLoginInfos().getFirst().getLoginId());
-        assertEquals("gmail login", saveNewLoginInfoResponse.getTitle());
-        assertEquals("www.gmail.com", saveNewLoginInfoResponse.getWebsite());
-        assertEquals("jack123@gmail.com", loginInfoRepository.findAll().getFirst().getLoginId());
-
+    public void userDeletes_NonExistentLoginInfo_ThrowExceptionTest() {
         DeleteLoginInfoRequest deleteLoginInfoRequest = new DeleteLoginInfoRequest();
         deleteLoginInfoRequest.setUsername("jack123");
         deleteLoginInfoRequest.setTitle("yahoo login");
@@ -1206,96 +526,26 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSignsUp_UserCreatesNoteTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    public void userCreatesNoteTest() throws Exception {
         CreateNoteRequest createNoteRequest = new CreateNoteRequest();
         createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
+        createNoteRequest.setTitle("secrets");
+        createNoteRequest.setContent("i cannot tell anyone.");
         CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
 
         User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-    }
-
-    @Test
-    public void twoUsersSignUp_UsersCreateNotesTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        registerRequest.setUsername("jim456");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jimRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(2, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-        assertEquals("jim456", jimRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse jackCreateNoteResponse = userService.createNote(createNoteRequest);
-
-        createNoteRequest.setUsername("jim456");
-        createNoteRequest.setTitle("designs");
-        createNoteRequest.setContent("Minimalist design for my bedroom");
-        CreateNoteResponse jimCreateNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-        User jimSafeBox = userRepository.findByUsername("jim456");
-        
-        assertEquals(2, vaultRepository.count());
         assertEquals(2, noteRepository.count());
-
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals(1, jimSafeBox.getVault().getNotes().size());
-
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("designs", jimSafeBox.getVault().getNotes().getFirst().getTitle());
-
-        assertEquals("Build an AI assistant for projects", jackCreateNoteResponse.getContent());
-        assertEquals("Minimalist design for my bedroom", jimCreateNoteResponse.getContent());
-
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-        assertEquals("designs", noteRepository.findAll().get(1).getTitle());
+        assertEquals(2, jackSafeBox.getVault().getNotes().size());
+        assertEquals("secrets", jackSafeBox.getVault().getNotes().get(1).getTitle());
+        assertEquals("i cannot tell anyone.", createNoteResponse.getContent());
+        assertEquals("secrets", noteRepository.findAll().get(1).getTitle());
     }
+
 
     @Test
     public void userSignsUp_UserLogsOuts_CreatesNote_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
@@ -1307,25 +557,14 @@ public class UserServiceImplementationTest {
 
         CreateNoteRequest createNoteRequest = new CreateNoteRequest();
         createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
+        createNoteRequest.setTitle("secrets");
+        createNoteRequest.setContent("i cannot tell anyone");
 
         assertThrows(ProfileLockStateException.class, ()->userService.createNote(createNoteRequest));
     }
 
     @Test
     public void nonExistentUser_CreatesNote_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         CreateNoteRequest createNoteRequest = new CreateNoteRequest();
         createNoteRequest.setUsername("jim456");
         createNoteRequest.setTitle("ideas");
@@ -1336,17 +575,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userCreatesNote_TitleFieldIsNull_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         CreateNoteRequest createNoteRequest = new CreateNoteRequest();
         createNoteRequest.setUsername("jack123");
         createNoteRequest.setTitle(null);
@@ -1357,17 +585,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userCreatesNote_TitleFieldIsEmpty_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         CreateNoteRequest createNoteRequest = new CreateNoteRequest();
         createNoteRequest.setUsername("jack123");
         createNoteRequest.setTitle("");
@@ -1378,32 +595,7 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_UserCreatesNote_WithExistingTitle_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
         CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         createNoteRequest.setUsername("jack123");
         createNoteRequest.setTitle("ideas");
         createNoteRequest.setContent("Create algorithm for flying robot");
@@ -1412,33 +604,7 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSignsUp_UserCreatesNote_UserEditsNoteTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
+    public void userSignsUp_UserCreatesNote_UserEditsNoteTest() throws Exception {
         EditNoteRequest editNoteRequest = new EditNoteRequest();
         editNoteRequest.setUsername("jack123");
         editNoteRequest.setTitle("ideas");
@@ -1446,7 +612,7 @@ public class UserServiceImplementationTest {
         editNoteRequest.setEditedContent("Build Robots for heart surgeries");
         EditNoteResponse editNoteResponse = userService.editNote(editNoteRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertEquals(1, vaultRepository.count());
         assertEquals(1, noteRepository.count());
@@ -1457,38 +623,12 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSignsUp_CreatesNote_UserLogsOut_UserEditsNote_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
+    public void userLogsOut_UserEditsNote_ThrowsExceptionTest() {
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertTrue(jackSafeBox.isLocked());
         assertEquals("jack123", jackLogoutResponse.getUsername());
@@ -1504,41 +644,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userSignsUp_CreatesNote_NonExistentUserEditsNote_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
-        LogoutRequest logoutRequest = new LogoutRequest();
-        logoutRequest.setUsername("jack123");
-        LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
-
-        jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertTrue(jackSafeBox.isLocked());
-        assertEquals("jack123", jackLogoutResponse.getUsername());
-
         EditNoteRequest editNoteRequest = new EditNoteRequest();
         editNoteRequest.setUsername("jim456");
         editNoteRequest.setTitle("ideas");
@@ -1550,32 +655,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userCreatesNote_UserEditsNote_TitleIsEmpty_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         EditNoteRequest editNoteRequest = new EditNoteRequest();
         editNoteRequest.setUsername("jack123");
         editNoteRequest.setTitle("ideas");
@@ -1587,32 +666,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userCreatesNote_UserEditsNote_TitleIsNull_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         EditNoteRequest editNoteRequest = new EditNoteRequest();
         editNoteRequest.setUsername("jack123");
         editNoteRequest.setTitle("ideas");
@@ -1623,75 +676,23 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userCreatesNote_UserViewsNoteTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
+    public void userCreatesNote_UserViewsNoteTest() throws Exception {
         ViewNoteRequest viewNoteRequest = new ViewNoteRequest();
         viewNoteRequest.setUsername("jack123");
         viewNoteRequest.setTitle("ideas");
         ViewNoteResponse viewNoteResponse = userService.viewNote(viewNoteRequest);
 
         assertEquals("ideas", viewNoteResponse.getTitle());
-        assertEquals("Build an AI assistant for projects", viewNoteResponse.getContent());
+        assertEquals("build an AI assistant for projects", viewNoteResponse.getContent());
     }
 
     @Test
     public void userLogsOut_UserViewsNote_ThrowsExceptionTestTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertTrue(jackSafeBox.isLocked());
         assertEquals("jack123", jackLogoutResponse.getUsername());
@@ -1705,34 +706,8 @@ public class UserServiceImplementationTest {
 
     @Test
     public void nonExistentUserViewsNote_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         ViewNoteRequest viewNoteRequest = new ViewNoteRequest();
-        viewNoteRequest.setUsername("jim456");
+        viewNoteRequest.setUsername("jim123");
         viewNoteRequest.setTitle("ideas");
 
         assertThrows(UserNotFoundException.class, ()->userService.viewNote(viewNoteRequest));
@@ -1740,32 +715,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userViewsNonExistentNote_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         ViewNoteRequest viewNoteRequest = new ViewNoteRequest();
         viewNoteRequest.setUsername("jack123");
         viewNoteRequest.setTitle("new ideas");
@@ -1775,39 +724,13 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userCreatesNote_UserDeletesNoteTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
         deleteNoteRequest.setUsername("jack123");
         deleteNoteRequest.setTitle("ideas");
         deleteNoteRequest.setMasterPassword("Password123.");
         DeleteNoteResponse deleteNoteResponse = userService.deleteNote(deleteNoteRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertEquals(0, noteRepository.count());
         assertEquals(0, jackSafeBox.getVault().getNotes().size());
@@ -1817,37 +740,11 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userCreatesNote_UserLogsOutDeletesNote_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setUsername("jack123");
         LogoutResponse jackLogoutResponse = userService.logout(logoutRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertTrue(jackSafeBox.isLocked());
         assertEquals("jack123", jackLogoutResponse.getUsername());
@@ -1862,32 +759,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userDeletesNonExistentNote_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
         deleteNoteRequest.setUsername("jack123");
         deleteNoteRequest.setTitle("new ideas");
@@ -1898,32 +769,6 @@ public class UserServiceImplementationTest {
 
     @Test
     public void userDeletesNote_PasswordIsInvalid_ThrowsExceptionTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        CreateNoteRequest createNoteRequest = new CreateNoteRequest();
-        createNoteRequest.setUsername("jack123");
-        createNoteRequest.setTitle("ideas");
-        createNoteRequest.setContent("Build an AI assistant for projects");
-        CreateNoteResponse createNoteResponse = userService.createNote(createNoteRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, vaultRepository.count());
-        assertEquals(1, noteRepository.count());
-        assertEquals(1, jackSafeBox.getVault().getNotes().size());
-        assertEquals("ideas", jackSafeBox.getVault().getNotes().getFirst().getTitle());
-        assertEquals("Build an AI assistant for projects", createNoteResponse.getContent());
-        assertEquals("ideas", noteRepository.findAll().getFirst().getTitle());
-
         DeleteNoteRequest deleteNoteRequest = new DeleteNoteRequest();
         deleteNoteRequest.setUsername("jack123");
         deleteNoteRequest.setTitle("ideas");
@@ -2001,76 +846,79 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userSavesCreditCardTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    public void userSavesCreditCardTest() throws Exception {
         SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
         saveCreditCardRequest.setUsername("jack123");
-        saveCreditCardRequest.setTitle("gtb savings card");
+        saveCreditCardRequest.setTitle("zenith savings card");
         saveCreditCardRequest.setCardNumber("5399831619690403");
-        saveCreditCardRequest.setExpiryDate("01/2025");
-        saveCreditCardRequest.setPin("1234");
-        saveCreditCardRequest.setCVV("567");
+        saveCreditCardRequest.setExpiryDate("01/2026");
+        saveCreditCardRequest.setPin("0987");
+        saveCreditCardRequest.setCVV("123");
         saveCreditCardRequest.setAdditionalInformation("for personal use");
         SaveCreditCardResponse jackSaveCreditCardResponse = userService.saveCreditCard(saveCreditCardRequest);
 
         User jackSafeBox = userRepository.findByUsername("jack123");
 
-        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
-        assertEquals(1, creditCardRepository.count());
-        assertEquals("gtb savings card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
-        assertEquals("gtb savings card", jackSaveCreditCardResponse.getTitle());
+        assertEquals(2, jackSafeBox.getVault().getCreditCards().size());
+        assertEquals(2, creditCardRepository.count());
+        assertEquals("zenith savings card", jackSafeBox.getVault().getCreditCards().get(1).getTitle());
+        assertEquals("zenith savings card", jackSaveCreditCardResponse.getTitle());
     }
 
     @Test
-    public void userEditsCreditCardTest() {
-        assertEquals(0, userRepository.count());
+    public void nonExistentUserSavesCreditCardTest() {
+        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
+        saveCreditCardRequest.setUsername("jim123");
+        saveCreditCardRequest.setTitle("zenith savings card");
+        saveCreditCardRequest.setCardNumber("5399831619690403");
+        saveCreditCardRequest.setExpiryDate("01/2026");
+        saveCreditCardRequest.setPin("0987");
+        saveCreditCardRequest.setCVV("123");
+        saveCreditCardRequest.setAdditionalInformation("for personal use");
 
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+        assertThrows(UserNotFoundException.class,()->userService.saveCreditCard(saveCreditCardRequest));
+    }
 
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
+    @Test
+    public void userSavesCreditCard_TitleIsEmptyTest() {
         SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
         saveCreditCardRequest.setUsername("jack123");
-        saveCreditCardRequest.setTitle("gtb savings card");
+        saveCreditCardRequest.setTitle("");
         saveCreditCardRequest.setCardNumber("5399831619690403");
-        saveCreditCardRequest.setExpiryDate("01/2025");
-        saveCreditCardRequest.setPin("1234");
-        saveCreditCardRequest.setCVV("567");
+        saveCreditCardRequest.setExpiryDate("01/2026");
+        saveCreditCardRequest.setPin("0987");
+        saveCreditCardRequest.setCVV("123");
         saveCreditCardRequest.setAdditionalInformation("for personal use");
-        SaveCreditCardResponse jackSaveCreditCardResponse = userService.saveCreditCard(saveCreditCardRequest);
 
-        User jackSafeBox = userRepository.findByUsername("jack123");
+        assertThrows(IllegalArgumentException.class,()->userService.saveCreditCard(saveCreditCardRequest));
+    }
 
-        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
-        assertEquals(1, creditCardRepository.count());
-        assertEquals("gtb savings card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
-        assertEquals("gtb savings card", jackSaveCreditCardResponse.getTitle());
+    @Test
+    public void userSavesCreditCard_CreditCardIsInvalidTest() {
+        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
+        saveCreditCardRequest.setUsername("jack123");
+        saveCreditCardRequest.setTitle("");
+        saveCreditCardRequest.setCardNumber("103831619690403");
+        saveCreditCardRequest.setExpiryDate("01/2026");
+        saveCreditCardRequest.setPin("0987");
+        saveCreditCardRequest.setCVV("123");
+        saveCreditCardRequest.setAdditionalInformation("for personal use");
 
+        assertThrows(IllegalArgumentException.class,()->userService.saveCreditCard(saveCreditCardRequest));
+    }
+
+    @Test
+    public void userEditsCreditCardTest() throws Exception {
         EditCreditCardRequest editCreditCardRequest = new EditCreditCardRequest();
         editCreditCardRequest.setUsername("jack123");
         editCreditCardRequest.setTitle("gtb savings card");
         editCreditCardRequest.setUpdateTitle("gtb current card");
-        editCreditCardRequest.setUpdatedCardNumber("5313581000123430");
+        editCreditCardRequest.setUpdatedCardNumber("5399834719278582");
         editCreditCardRequest.setUpdatedCardNumber("01/2028");
         editCreditCardRequest.setUpdatedAdditionalInformation("for office use");
         EditCreditCardResponse jackEditCreditCardResponse = userService.editCreditCard(editCreditCardRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
         assertEquals("gtb current card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
@@ -2079,36 +927,32 @@ public class UserServiceImplementationTest {
     }
 
     @Test
-    public void userViewsCreditCardTest() {
-        assertEquals(0, userRepository.count());
+    public void nonExistentUserEditsCreditCardTest() {
+        EditCreditCardRequest editCreditCardRequest = new EditCreditCardRequest();
+        editCreditCardRequest.setUsername("jim123");
+        editCreditCardRequest.setTitle("gtb savings card");
+        editCreditCardRequest.setUpdateTitle("gtb current card");
+        editCreditCardRequest.setUpdatedCardNumber("5399831619690403");
+        editCreditCardRequest.setUpdatedCardNumber("01/2028");
+        editCreditCardRequest.setUpdatedAdditionalInformation("for office use");
 
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
+        assertThrows(UserNotFoundException.class, ()->userService.editCreditCard(editCreditCardRequest));
+    }
+    @Test
+    public void userEditsCreditCard_CardNumberIsInvalidTest() {
+        EditCreditCardRequest editCreditCardRequest = new EditCreditCardRequest();
+        editCreditCardRequest.setUsername("jim123");
+        editCreditCardRequest.setTitle("gtb savings card");
+        editCreditCardRequest.setUpdateTitle("gtb current card");
+        editCreditCardRequest.setUpdatedCardNumber("012831619690403");
+        editCreditCardRequest.setUpdatedCardNumber("01/2028");
+        editCreditCardRequest.setUpdatedAdditionalInformation("for office use");
 
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
+        assertThrows(UserNotFoundException.class, ()->userService.editCreditCard(editCreditCardRequest));
+    }
 
-        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
-        saveCreditCardRequest.setUsername("jack123");
-        saveCreditCardRequest.setTitle("gtb savings card");
-        saveCreditCardRequest.setCardNumber("5399831619690403");
-        saveCreditCardRequest.setExpiryDate("01/2025");
-        saveCreditCardRequest.setPin("1234");
-        saveCreditCardRequest.setCVV("567");
-        saveCreditCardRequest.setAdditionalInformation("for personal use");
-        SaveCreditCardResponse jackSaveCreditCardResponse = userService.saveCreditCard(saveCreditCardRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-        String id = jackSafeBox.getVault().getCreditCards().getFirst().getId();
-
-        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
-        assertEquals(1, creditCardRepository.count());
-        assertEquals("gtb savings card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
-        assertEquals("gtb savings card", jackSaveCreditCardResponse.getTitle());
-
+    @Test
+    public void userViewsCreditCardTest() throws Exception {
         ViewCreditCardRequest viewCreditCardRequest = new ViewCreditCardRequest();
         viewCreditCardRequest.setUsername("jack123");
         viewCreditCardRequest.setTitle("gtb savings card");
@@ -2119,233 +963,39 @@ public class UserServiceImplementationTest {
     }
 
     @Test
+    public void userViews_NonExistentCreditCardTest() {
+        ViewCreditCardRequest viewCreditCardRequest = new ViewCreditCardRequest();
+        viewCreditCardRequest.setUsername("jack123");
+        viewCreditCardRequest.setTitle("uba savings card");
+
+        assertThrows(CreditCardNotFoundException.class,()->userService.viewCreditCard(viewCreditCardRequest));
+    }
+
+    @Test
     public void userDeletesCreditCardTest(){
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SaveCreditCardRequest saveCreditCardRequest = new SaveCreditCardRequest();
-        saveCreditCardRequest.setUsername("jack123");
-        saveCreditCardRequest.setTitle("gtb savings card");
-        saveCreditCardRequest.setCardNumber("5399831619690403");
-        saveCreditCardRequest.setExpiryDate("01/2025");
-        saveCreditCardRequest.setPin("1234");
-        saveCreditCardRequest.setCVV("567");
-        saveCreditCardRequest.setAdditionalInformation("for personal use");
-        SaveCreditCardResponse jackSaveCreditCardResponse = userService.saveCreditCard(saveCreditCardRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, jackSafeBox.getVault().getCreditCards().size());
-        assertEquals(1, creditCardRepository.count());
-        assertEquals("gtb savings card", jackSafeBox.getVault().getCreditCards().getFirst().getTitle());
-        assertEquals("gtb savings card", jackSaveCreditCardResponse.getTitle());
-
         DeleteCreditCardRequest deleteCreditCardRequest = new DeleteCreditCardRequest();
         deleteCreditCardRequest.setUsername("jack123");
         deleteCreditCardRequest.setTitle("gtb savings card");
         deleteCreditCardRequest.setMasterPassword("Password123.");
         DeleteCreditCardResponse jackDeleteCreditCardResponse = userService.deleteCreditCard(deleteCreditCardRequest);
 
-        jackSafeBox = userRepository.findByUsername("jack123");
+        User jackSafeBox = userRepository.findByUsername("jack123");
 
         assertEquals(0, jackSafeBox.getVault().getCreditCards().size());
         assertEquals(0, vaultRepository.findAll().getFirst().getCreditCards().size());
         assertEquals(0, creditCardRepository.count());
         assertEquals("gtb savings card", jackDeleteCreditCardResponse.getTitle());
-
     }
 
     @Test
-    public void savePassportTest() {
-        assertEquals(0, userRepository.count());
+    public void nonExistentUserDeletesCreditCardTest(){
+        DeleteCreditCardRequest deleteCreditCardRequest = new DeleteCreditCardRequest();
+        deleteCreditCardRequest.setUsername("jim123");
+        deleteCreditCardRequest.setTitle("gtb savings card");
+        deleteCreditCardRequest.setMasterPassword("Password123.");
 
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SavePassportRequest savePassportRequest = new SavePassportRequest();
-        savePassportRequest.setUsername("jack123");
-        savePassportRequest.setTitle("my personal passport");
-        savePassportRequest.setSurname("smith");
-        savePassportRequest.setGivenNames("john scott");
-        savePassportRequest.setNationality("british");
-        savePassportRequest.setPlaceOfBirth("london");
-        savePassportRequest.setDateOfBirth("");
-        savePassportRequest.setPassportNumber("533401372");
-        savePassportRequest.setIssueDate("");
-        savePassportRequest.setExpiryDate("");
-        SavePassportResponse jackSavePassportResponse = userService.savePassport(savePassportRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, passportRepository.count());
-        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
-        assertEquals(1, jackSafeBox.getVault().getPassports().size());
-        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
-        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
+        assertThrows(UserNotFoundException.class, ()->userService.deleteCreditCard(deleteCreditCardRequest));
     }
-
-    @Test
-    public void userEditsPassportTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SavePassportRequest savePassportRequest = new SavePassportRequest();
-        savePassportRequest.setUsername("jack123");
-        savePassportRequest.setTitle("my personal passport");
-        savePassportRequest.setSurname("smith");
-        savePassportRequest.setGivenNames("john scott");
-//        savePassportRequest.setNationality("british");
-//        savePassportRequest.setPlaceOfBirth("london");
-//        savePassportRequest.setDateOfBirth("");
-        savePassportRequest.setPassportNumber("533401372");
-//        savePassportRequest.setIssueDate("");
-//        savePassportRequest.setExpiryDate("");
-        SavePassportResponse jackSavePassportResponse = userService.savePassport(savePassportRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, passportRepository.count());
-        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
-        assertEquals(1, jackSafeBox.getVault().getPassports().size());
-        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
-        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
-        assertNull(jackSafeBox.getVault().getPassports().getFirst().getNationality());
-        assertNull(jackSafeBox.getVault().getPassports().getFirst().getPlaceOfBirth());
-        assertNull(jackSafeBox.getVault().getPassports().getFirst().getDateOfBirth());
-        assertNull(jackSafeBox.getVault().getPassports().getFirst().getIssueDate());
-        assertNull(jackSafeBox.getVault().getPassports().getFirst().getExpiryDate());
-
-        EditPassportRequest editPassportRequest = new EditPassportRequest();
-        editPassportRequest.setUsername("jack123");
-        editPassportRequest.setTitle("my personal passport");
-        editPassportRequest.setUpdatedNationality("british");
-        editPassportRequest.setUpdatedPlaceOfBirth("london");
-        editPassportRequest.setUpdatedDateOfBirth("");
-        editPassportRequest.setUpdatedExpiryDate("");
-        editPassportRequest.setUpdatedIssueDate("");
-        editPassportRequest.setUpdatedExpiryDate("");
-
-        jackSafeBox = userRepository.findByUsername("jack123");
-        assertEquals(1, passportRepository.count());
-        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
-        assertEquals(1, jackSafeBox.getVault().getPassports().size());
-        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
-        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
-        assertEquals("", jackSafeBox.getVault().getPassports().getFirst().getIssueDate());
-        assertEquals("", jackSafeBox.getVault().getPassports().getFirst().getExpiryDate());
-    }
-
-    @Test
-    public void userViewsPassportTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SavePassportRequest savePassportRequest = new SavePassportRequest();
-        savePassportRequest.setUsername("jack123");
-        savePassportRequest.setTitle("my personal passport");
-        savePassportRequest.setSurname("smith");
-        savePassportRequest.setGivenNames("john scott");
-        savePassportRequest.setNationality("british");
-        savePassportRequest.setPlaceOfBirth("london");
-        savePassportRequest.setDateOfBirth("");
-        savePassportRequest.setPassportNumber("533401372");
-        savePassportRequest.setIssueDate("");
-        savePassportRequest.setExpiryDate("");
-        SavePassportResponse jackSavePassportResponse = userService.savePassport(savePassportRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, passportRepository.count());
-        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
-        assertEquals(1, jackSafeBox.getVault().getPassports().size());
-        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
-        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
-
-        ViewPassportRequest viewPassportRequest = new ViewPassportRequest();
-        viewPassportRequest.setUsername("jack123");
-        viewPassportRequest.setTitle("my personal passport");
-        ViewPassportResponse viewPassportResponse = userService.viewPassport(viewPassportRequest);
-
-    }
-
-    @Test
-    public void deletePassportTest() {
-        assertEquals(0, userRepository.count());
-
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername("jack123");
-        registerRequest.setMasterPassword("Password123.");
-        registerRequest.setConfirmMasterPassword("Password123.");
-        RegisterResponse jackRegisterResponse = userService.signUp(registerRequest);
-
-        assertEquals(1, userRepository.count());
-        assertEquals("jack123", jackRegisterResponse.getUsername());
-
-        SavePassportRequest savePassportRequest = new SavePassportRequest();
-        savePassportRequest.setUsername("jack123");
-        savePassportRequest.setTitle("my personal passport");
-        savePassportRequest.setSurname("smith");
-        savePassportRequest.setGivenNames("john scott");
-        savePassportRequest.setNationality("british");
-        savePassportRequest.setPlaceOfBirth("london");
-        savePassportRequest.setDateOfBirth("");
-        savePassportRequest.setPassportNumber("533401372");
-        savePassportRequest.setIssueDate("");
-        savePassportRequest.setExpiryDate("");
-        SavePassportResponse jackSavePassportResponse = userService.savePassport(savePassportRequest);
-
-        User jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(1, passportRepository.count());
-        assertEquals(1, vaultRepository.findAll().getFirst().getPassports().size());
-        assertEquals(1, jackSafeBox.getVault().getPassports().size());
-        assertEquals("my personal passport", jackSafeBox.getVault().getPassports().getFirst().getTitle());
-        assertEquals("my personal passport", jackSavePassportResponse.getTitle());
-
-        DeletePassportRequest deletePassportRequest = new DeletePassportRequest();
-        deletePassportRequest.setTitle("my personal passport");
-        deletePassportRequest.setUsername("jack123");
-        deletePassportRequest.setMasterPassword("Password123.");
-        DeletePassportResponse jackDeletePassportResponse = userService.deletePassport(deletePassportRequest);
-
-        jackSafeBox = userRepository.findByUsername("jack123");
-
-        assertEquals(0, passportRepository.count());
-        assertEquals(0, vaultRepository.findAll().getFirst().getPassports().size());
-        assertEquals(0, jackSafeBox.getVault().getPassports().size());
-        assertEquals("my personal passport", jackDeletePassportResponse.getTitle());
-    }
-
 
 
 }

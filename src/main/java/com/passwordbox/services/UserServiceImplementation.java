@@ -71,7 +71,7 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public SaveNewLoginInfoResponse saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest) {
+    public SaveNewLoginInfoResponse saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest) throws Exception {
         User user = userRepository.findByUsername(saveNewLoginInfoRequest.getUsername().toLowerCase());
         if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", saveNewLoginInfoRequest.getUsername()));
         if (user.isLocked()) throw new ProfileLockStateException("Please Login to Save Login Info");
@@ -81,7 +81,7 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public EditLoginInfoResponse editLoginInfo(EditLoginInfoRequest editLoginInfoRequest) {
+    public EditLoginInfoResponse editLoginInfo(EditLoginInfoRequest editLoginInfoRequest) throws Exception {
         User user = userRepository.findByUsername(editLoginInfoRequest.getUsername().toLowerCase());
         if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", editLoginInfoRequest.getUsername()));
         if (user.isLocked()) throw new ProfileLockStateException("Please Login to Edit Login Info");
@@ -91,7 +91,7 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public ViewLoginInfoResponse viewLoginInfo(ViewLoginInfoRequest viewLoginInfoRequest) {
+    public ViewLoginInfoResponse viewLoginInfo(ViewLoginInfoRequest viewLoginInfoRequest) throws Exception {
         User user = userRepository.findByUsername(viewLoginInfoRequest.getUsername().toLowerCase());
         if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", viewLoginInfoRequest.getUsername()));
         if (user.isLocked()) throw new ProfileLockStateException("Please Login to view Login Info");
@@ -109,7 +109,7 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public CreateNoteResponse createNote(CreateNoteRequest createNoteRequest) {
+    public CreateNoteResponse createNote(CreateNoteRequest createNoteRequest) throws Exception {
         User user = userRepository.findByUsername(createNoteRequest.getUsername().toLowerCase());
         if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", createNoteRequest.getUsername()));
         if (user.isLocked()) throw new ProfileLockStateException("Please Login to create note");
@@ -119,7 +119,7 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public EditNoteResponse editNote(EditNoteRequest editNoteRequest) {
+    public EditNoteResponse editNote(EditNoteRequest editNoteRequest) throws Exception {
         User user = userRepository.findByUsername(editNoteRequest.getUsername().toLowerCase());
         if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", editNoteRequest.getUsername()));
         if (user.isLocked()) throw new ProfileLockStateException("Please Login to Edit Note");
@@ -129,7 +129,7 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public ViewNoteResponse viewNote(ViewNoteRequest viewNoteRequest) {
+    public ViewNoteResponse viewNote(ViewNoteRequest viewNoteRequest) throws Exception {
         User user = userRepository.findByUsername(viewNoteRequest.getUsername().toLowerCase());
         if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", viewNoteRequest.getUsername()));
         if (user.isLocked()) throw new ProfileLockStateException("Please Login to view Note");
@@ -164,22 +164,27 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public SaveCreditCardResponse saveCreditCard(SaveCreditCardRequest saveCreditCardRequest) {
+    public SaveCreditCardResponse saveCreditCard(SaveCreditCardRequest saveCreditCardRequest) throws Exception {
         User user = userRepository.findByUsername(saveCreditCardRequest.getUsername());
+        if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", saveCreditCardRequest.getUsername()));
+        if (user.isLocked()) throw new ProfileLockStateException("Please Login to Save Login Info");
         CreditCard creditCard = vaultService.saveCreditCard(saveCreditCardRequest, user.getVault());
         userRepository.save(user);
         return saveCreditCardResponseMap(creditCard);
     }
 
+
     @Override
-    public EditCreditCardResponse editCreditCard(EditCreditCardRequest editCreditCardRequest) {
+    public EditCreditCardResponse editCreditCard(EditCreditCardRequest editCreditCardRequest) throws Exception {
         User user = userRepository.findByUsername(editCreditCardRequest.getUsername());
+        if (user == null) throw new UserNotFoundException(String.format("User %s does not exist.", editCreditCardRequest.getUsername()));
+        if (user.isLocked()) throw new ProfileLockStateException("Please login to edit credit card");
         CreditCard creditCard = vaultService.editCreditCard(editCreditCardRequest, user.getVault());
         return editCreditCardResponseMap(creditCard);
     }
 
     @Override
-    public ViewCreditCardResponse viewCreditCard(ViewCreditCardRequest viewCreditCardRequest) {
+    public ViewCreditCardResponse viewCreditCard(ViewCreditCardRequest viewCreditCardRequest) throws Exception {
         User user = userRepository.findByUsername(viewCreditCardRequest.getUsername());
         CreditCard creditCard = findCreditCardInVault(viewCreditCardRequest.getTitle(), user.getVault());
         return viewCreditCardResponseMap(creditCard);
@@ -192,24 +197,6 @@ public class UserServiceImplementation implements UserService{
         return vaultService.deleteCreditCard(deleteCreditCardRequest, user.getVault());
     }
 
-    @Override
-    public SavePassportResponse savePassport(SavePassportRequest savePassportRequest) {
-        User user = userRepository.findByUsername(savePassportRequest.getUsername());
-        Passport passport = vaultService.savePassport(savePassportRequest, user.getVault());
-        userRepository.save(user);
-        return savePassportResponseMap(passport);
-    }
-
-    @Override
-    public ViewPassportResponse viewPassport(ViewPassportRequest viewPassportRequest) {
-        return null;
-    }
-
-    @Override
-    public DeletePassportResponse deletePassport(DeletePassportRequest deletePassportRequest) {
-        User user = userRepository.findByUsername(deletePassportRequest.getUsername());
-        return vaultService.deletePassport(deletePassportRequest, user.getVault());
-    }
 
 
 }

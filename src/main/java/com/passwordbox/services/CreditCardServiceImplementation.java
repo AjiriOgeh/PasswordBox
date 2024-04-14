@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import static com.passwordbox.utilities.FindDetails.findCreditCardInVault;
 import static com.passwordbox.utilities.Mappers.*;
+import static com.passwordbox.utilities.ValidateInputs.*;
 
 @Service
 public class CreditCardServiceImplementation implements CreditCardService{
@@ -20,14 +21,23 @@ public class CreditCardServiceImplementation implements CreditCardService{
     private CreditCardRepository creditCardRepository;
 
     @Override
-    public CreditCard saveCreditCard(SaveCreditCardRequest saveCreditCardRequest) {
+    public CreditCard saveCreditCard(SaveCreditCardRequest saveCreditCardRequest, Vault vault) throws Exception {
+        validateCreditCardTitle(saveCreditCardRequest.getTitle(), vault);
+        validateCreditCardNumber(saveCreditCardRequest.getCardNumber());
+        validateCreditCardCVV(saveCreditCardRequest.getCVV());
+        validateCreditCardPin(saveCreditCardRequest.getPin());
         CreditCard creditCard = saveCreditCardRequestMap(saveCreditCardRequest);
         creditCardRepository.save(creditCard);
         return creditCard;
     }
 
+
     @Override
-    public CreditCard editCreditCard(EditCreditCardRequest editCreditCardRequest, Vault vault) {
+    public CreditCard editCreditCard(EditCreditCardRequest editCreditCardRequest, Vault vault) throws Exception {
+//        validateCreditCardTitle(editCreditCardRequest.getUpdateTitle(), vault);
+//        validateCreditCardNumber(editCreditCardRequest.getUpdatedCardNumber());
+//        validateCreditCardCVV(editCreditCardRequest.getUpdatedCVV());
+//        validateCreditCardPin(editCreditCardRequest.getUpdatedPin());
         CreditCard creditCard = findCreditCardInVault(editCreditCardRequest.getTitle().toLowerCase(), vault);
         CreditCard updatedCreditCard = editCreditCardRequestMap(editCreditCardRequest, creditCard);
         creditCardRepository.save(updatedCreditCard);
@@ -41,4 +51,5 @@ public class CreditCardServiceImplementation implements CreditCardService{
         creditCardRepository.delete(creditCard);
         return deleteCreditCardResponse;
     }
+
 }

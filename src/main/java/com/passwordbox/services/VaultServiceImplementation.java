@@ -6,8 +6,6 @@ import com.passwordbox.dataTransferObjects.requests.*;
 import com.passwordbox.dataTransferObjects.responses.DeleteCreditCardResponse;
 import com.passwordbox.dataTransferObjects.responses.DeleteLoginInfoResponse;
 import com.passwordbox.dataTransferObjects.responses.DeleteNoteResponse;
-import com.passwordbox.dataTransferObjects.responses.DeletePassportResponse;
-import com.passwordbox.exceptions.NoteNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +26,6 @@ public class VaultServiceImplementation implements VaultService{
     @Autowired
     private CreditCardService creditCardService;
 
-    @Autowired
-    private PassportService passportService;
-
     @Override
     public Vault createVault() {
         Vault newVault = new Vault();
@@ -39,7 +34,7 @@ public class VaultServiceImplementation implements VaultService{
     }
 
     @Override
-    public LoginInfo saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault) {
+    public LoginInfo saveNewLoginInfo(SaveNewLoginInfoRequest saveNewLoginInfoRequest, Vault vault) throws Exception {
         LoginInfo loginInfo = loginInfoService.saveNewLoginInfo(saveNewLoginInfoRequest, vault);
         vault.getLoginInfos().add(loginInfo);
         vaultRepository.save(vault);
@@ -47,7 +42,7 @@ public class VaultServiceImplementation implements VaultService{
     }
 
     @Override
-    public LoginInfo editLoginInfo(EditLoginInfoRequest editLoginInfoRequest, Vault vault) {
+    public LoginInfo editLoginInfo(EditLoginInfoRequest editLoginInfoRequest, Vault vault) throws Exception {
         LoginInfo loginInfo = loginInfoService.editLoginInfo(editLoginInfoRequest, vault);
         vaultRepository.save(vault);
         return loginInfo;
@@ -71,7 +66,7 @@ public class VaultServiceImplementation implements VaultService{
     }
 
     @Override
-    public Note editNote(EditNoteRequest editNoteRequest, Vault vault) {
+    public Note editNote(EditNoteRequest editNoteRequest, Vault vault) throws Exception {
         Note note = noteService.editNote(editNoteRequest, vault);
         vaultRepository.save(vault);
         return note;
@@ -87,15 +82,15 @@ public class VaultServiceImplementation implements VaultService{
     }
 
     @Override
-    public CreditCard saveCreditCard(SaveCreditCardRequest saveCreditCardRequest, Vault vault) {
-        CreditCard creditCard = creditCardService.saveCreditCard(saveCreditCardRequest);
+    public CreditCard saveCreditCard(SaveCreditCardRequest saveCreditCardRequest, Vault vault) throws Exception {
+        CreditCard creditCard = creditCardService.saveCreditCard(saveCreditCardRequest, vault);
         vault.getCreditCards().add(creditCard);
         vaultRepository.save(vault);
         return creditCard;
     }
 
     @Override
-    public CreditCard editCreditCard(EditCreditCardRequest editCreditCardRequest, Vault vault) {
+    public CreditCard editCreditCard(EditCreditCardRequest editCreditCardRequest, Vault vault) throws Exception {
         CreditCard creditCard = creditCardService.editCreditCard(editCreditCardRequest, vault);
         vaultRepository.save(vault);
         return creditCard;
@@ -110,20 +105,5 @@ public class VaultServiceImplementation implements VaultService{
         return deleteCreditCardResponse;
     }
 
-    @Override
-    public Passport savePassport(SavePassportRequest savePassportRequest, Vault vault) {
-        Passport passport = passportService.savePassport(savePassportRequest);
-        vault.getPassports().add(passport);
-        vaultRepository.save(vault);
-        return passport;
-    }
-
-    @Override
-    public DeletePassportResponse deletePassport(DeletePassportRequest deletePassportRequest, Vault vault) {
-        Passport passport = findPassportInVault(deletePassportRequest.getUsername(), vault);
-        DeletePassportResponse deletePassportResponse = passportService.deletePassport(deletePassportRequest, vault);
-        vault.getPassports().remove(passport);
-        return null;
-    }
 
 }

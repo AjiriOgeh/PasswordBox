@@ -31,13 +31,7 @@ public class FindDetails {
         throw new CreditCardNotFoundException("CreditCard does not Exist. Please Try Again");
     }
 
-    public static Passport findPassportInVault(String title, Vault vault) {
-        for (int count = 0; count < vault.getPassports().size(); count++) {
-            if (vault.getPassports().get(count).getTitle().equals(title))
-                return vault.getPassports().get(count);
-        }
-        throw new PassportNotFoundException("Passport does not Exist. Please Try again");
-    }
+
 
 
 }

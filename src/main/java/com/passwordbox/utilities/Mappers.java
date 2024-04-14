@@ -9,6 +9,17 @@ import java.time.format.DateTimeFormatter;
 import static com.passwordbox.utilities.PasscodeGenerator.generatePassword;
 
 public class Mappers {
+
+    static EncryptDecryptPassword encryptDecryptPassword;
+
+    static {
+        try {
+            encryptDecryptPassword = new EncryptDecryptPassword();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static User registerRequestMap(RegisterRequest registerRequest, Vault vault) {
         User newUser = new User();
         newUser.setUsername(registerRequest.getUsername().toLowerCase());
@@ -39,13 +50,13 @@ public class Mappers {
         return loginResponse;
     }
 
-    public static LoginInfo saveNewLoginInfoRequestMap(SaveNewLoginInfoRequest saveNewLoginInfoRequest) {
+    public static LoginInfo saveNewLoginInfoRequestMap(SaveNewLoginInfoRequest saveNewLoginInfoRequest) throws Exception {
         LoginInfo loginInfo = new LoginInfo();
         loginInfo.setTitle(saveNewLoginInfoRequest.getTitle().toLowerCase());
         loginInfo.setWebsite(saveNewLoginInfoRequest.getWebsite());
         loginInfo.setLoginId(saveNewLoginInfoRequest.getLoginId());
         if (saveNewLoginInfoRequest.getPassword() == null) loginInfo.setPassword(generatePassword(16));
-        else loginInfo.setPassword(saveNewLoginInfoRequest.getPassword());
+        else loginInfo.setPassword(encryptDecryptPassword.encrypt(saveNewLoginInfoRequest.getPassword()));
         return loginInfo;
     }
 
@@ -59,11 +70,11 @@ public class Mappers {
         return saveNewLoginInfoResponse;
     }
 
-    public static LoginInfo editLoginInfoRequestMap(EditLoginInfoRequest editLoginInfoRequest, LoginInfo loginInfo) {
+    public static LoginInfo editLoginInfoRequestMap(EditLoginInfoRequest editLoginInfoRequest, LoginInfo loginInfo) throws Exception {
         if (editLoginInfoRequest.getEditedTitle() != null) loginInfo.setTitle(editLoginInfoRequest.getEditedTitle().toLowerCase().trim());
         if (editLoginInfoRequest.getEditedLoginId() != null) loginInfo.setLoginId(editLoginInfoRequest.getEditedLoginId());
         if (editLoginInfoRequest.getEditedWebsite() != null) loginInfo.setWebsite(editLoginInfoRequest.getEditedWebsite());
-        if (editLoginInfoRequest.getEditedPassword() != null) loginInfo.setPassword(editLoginInfoRequest.getEditedPassword());
+        if (editLoginInfoRequest.getEditedPassword() != null) loginInfo.setPassword(encryptDecryptPassword.encrypt(editLoginInfoRequest.getEditedPassword()));
         return loginInfo;
     }
 
@@ -75,13 +86,13 @@ public class Mappers {
         return editLoginInfoResponse;
     }
 
-    public static ViewLoginInfoResponse viewLoginInfoResponseMap(LoginInfo loginInfo){
+    public static ViewLoginInfoResponse viewLoginInfoResponseMap(LoginInfo loginInfo) throws Exception {
         ViewLoginInfoResponse viewLoginInfoResponse = new ViewLoginInfoResponse();
         viewLoginInfoResponse.setId(loginInfo.getId());
         viewLoginInfoResponse.setTitle(loginInfo.getTitle());
         viewLoginInfoResponse.setWebsite(loginInfo.getWebsite());
         viewLoginInfoResponse.setLoginId(loginInfo.getLoginId());
-        viewLoginInfoResponse.setPassword(loginInfo.getPassword());
+        viewLoginInfoResponse.setPassword(encryptDecryptPassword.decrypt(loginInfo.getPassword()));
         return viewLoginInfoResponse;
     }
 
@@ -99,17 +110,17 @@ public class Mappers {
         return newNote;
     }
 
-    public static CreateNoteResponse createNoteResponseMap(Note note) {
+    public static CreateNoteResponse createNoteResponseMap(Note note) throws Exception {
         CreateNoteResponse createNoteResponse = new CreateNoteResponse();
         createNoteResponse.setId(note.getId());
         createNoteResponse.setTitle(note.getTitle());
-        createNoteResponse.setContent(note.getContent());
+        createNoteResponse.setContent(encryptDecryptPassword.encrypt(note.getContent()));
         return createNoteResponse;
     }
 
-    public static Note editNoteRequestMap(EditNoteRequest editNoteRequest, Note note) {
+    public static Note editNoteRequestMap(EditNoteRequest editNoteRequest, Note note) throws Exception {
         if (editNoteRequest.getEditedTitle() != null) note.setTitle(editNoteRequest.getEditedTitle().toLowerCase().trim());
-        if (editNoteRequest.getEditedContent() != null) note.setContent(editNoteRequest.getEditedContent());
+        if (editNoteRequest.getEditedContent() != null) note.setContent(encryptDecryptPassword.encrypt(editNoteRequest.getEditedContent()));
         return note;
     }
 
@@ -121,11 +132,11 @@ public class Mappers {
         return editNoteResponse;
     }
 
-    public static ViewNoteResponse viewNoteResponseMap(Note note) {
+    public static ViewNoteResponse viewNoteResponseMap(Note note) throws Exception {
         ViewNoteResponse viewNoteResponse = new ViewNoteResponse();
         viewNoteResponse.setId(note.getId());
         viewNoteResponse.setTitle(note.getTitle());
-        viewNoteResponse.setContent(note.getContent());
+        viewNoteResponse.setContent(encryptDecryptPassword.decrypt(note.getContent()));
         return viewNoteResponse;
     }
 
@@ -150,13 +161,13 @@ public class Mappers {
         return generatePinResponse;
     }
 
-    public static CreditCard saveCreditCardRequestMap(SaveCreditCardRequest saveCreditCardRequest) {
+    public static CreditCard saveCreditCardRequestMap(SaveCreditCardRequest saveCreditCardRequest) throws Exception {
         CreditCard creditCard = new CreditCard();
         creditCard.setTitle(saveCreditCardRequest.getTitle());
-        creditCard.setCardNumber(saveCreditCardRequest.getCardNumber());
-        creditCard.setCardType(saveCreditCardRequest.getCardType());
-        creditCard.setCVV(saveCreditCardRequest.getCVV());
-        creditCard.setAdditionalInformation(saveCreditCardRequest.getAdditionalInformation());
+        creditCard.setCardNumber(encryptDecryptPassword.encrypt(saveCreditCardRequest.getCardNumber()));
+        creditCard.setCardType(encryptDecryptPassword.encrypt(saveCreditCardRequest.getCardType()));
+        creditCard.setCVV(encryptDecryptPassword.encrypt(saveCreditCardRequest.getCVV()));
+        creditCard.setAdditionalInformation(encryptDecryptPassword.encrypt(saveCreditCardRequest.getAdditionalInformation()));
         return creditCard;
     }
 
@@ -168,13 +179,13 @@ public class Mappers {
         return saveCreditCardResponse;
     }
 
-    public static CreditCard editCreditCardRequestMap(EditCreditCardRequest editCreditCardRequest, CreditCard creditCard) {
-        if (editCreditCardRequest.getUpdateTitle() != null) creditCard.setTitle(editCreditCardRequest.getUpdateTitle());
-        if (editCreditCardRequest.getUpdatedCardNumber() != null) creditCard.setCardNumber(editCreditCardRequest.getUpdatedCardNumber());
-        if (editCreditCardRequest.getUpdatedPin() != null) creditCard.setPin(editCreditCardRequest.getUpdatedPin());
+    public static CreditCard editCreditCardRequestMap(EditCreditCardRequest editCreditCardRequest, CreditCard creditCard) throws Exception {
+        if (editCreditCardRequest.getUpdateTitle() != null) creditCard.setTitle(encryptDecryptPassword.encrypt(editCreditCardRequest.getUpdateTitle()));
+        if (editCreditCardRequest.getUpdatedCardNumber() != null) creditCard.setCardNumber(encryptDecryptPassword.encrypt(editCreditCardRequest.getUpdatedCardNumber()));
+        if (editCreditCardRequest.getUpdatedPin() != null) creditCard.setPin(encryptDecryptPassword.encrypt(editCreditCardRequest.getUpdatedPin()));
         if (editCreditCardRequest.getUpdatedAdditionalInformation() != null) creditCard.setAdditionalInformation(editCreditCardRequest.getUpdatedAdditionalInformation());
-        if (editCreditCardRequest.getUpdatedCVV() != null) creditCard.setCVV(editCreditCardRequest.getUpdatedCVV());
-        if (editCreditCardRequest.getUpdatedExpiryDate() != null) creditCard.setExpiryDate(editCreditCardRequest.getUpdatedExpiryDate());
+        if (editCreditCardRequest.getUpdatedCVV() != null) creditCard.setCVV(encryptDecryptPassword.encrypt(editCreditCardRequest.getUpdatedCVV()));
+        if (editCreditCardRequest.getUpdatedExpiryDate() != null) creditCard.setExpiryDate(encryptDecryptPassword.encrypt(editCreditCardRequest.getUpdatedExpiryDate()));
         return creditCard;
     }
 
@@ -185,10 +196,13 @@ public class Mappers {
         return editCreditCardResponse;
     }
 
-    public static ViewCreditCardResponse viewCreditCardResponseMap(CreditCard creditCard) {
+    public static ViewCreditCardResponse viewCreditCardResponseMap(CreditCard creditCard) throws Exception {
         ViewCreditCardResponse viewCreditCardResponse = new ViewCreditCardResponse();
         viewCreditCardResponse.setId(creditCard.getId());
         viewCreditCardResponse.setTitle(creditCard.getTitle());
+        viewCreditCardResponse.setCreditCardNumber(encryptDecryptPassword.decrypt(creditCard.getCardNumber()));
+        viewCreditCardResponse.setPin(encryptDecryptPassword.decrypt(creditCard.getPin()));
+        viewCreditCardResponse.setCVV(encryptDecryptPassword.decrypt(creditCard.getCVV()));
         return viewCreditCardResponse;
     }
 
@@ -199,30 +213,4 @@ public class Mappers {
         return deleteCreditCardResponse;
     }
 
-    public static Passport savePassportRequestMap(SavePassportRequest savePassportRequest) {
-        Passport passport = new Passport();
-        passport.setTitle(savePassportRequest.getTitle());
-        passport.setPassportNumber(savePassportRequest.getPassportNumber());
-        passport.setDateOfBirth(savePassportRequest.getDateOfBirth());
-        passport.setNationality(savePassportRequest.getNationality());
-        passport.setSurname(savePassportRequest.getSurname());
-        passport.setGivenNames(savePassportRequest.getGivenNames());
-        passport.setIssueDate(savePassportRequest.getIssueDate());
-        passport.setExpiryDate(savePassportRequest.getExpiryDate());
-        return passport;
-    }
-
-    public static SavePassportResponse savePassportResponseMap(Passport passport) {
-        SavePassportResponse savePassportResponse = new SavePassportResponse();
-        savePassportResponse.setId(passport.getId());
-        savePassportResponse.setTitle(passport.getTitle());
-        return savePassportResponse;
-    }
-
-    public static DeletePassportResponse deletePassportResponseMap(Passport passport) {
-        DeletePassportResponse deletePassportResponse = new DeletePassportResponse();
-        deletePassportResponse.setId(passport.getId());
-        deletePassportResponse.setTitle(passport.getTitle());
-        return deletePassportResponse;
-    }
 }

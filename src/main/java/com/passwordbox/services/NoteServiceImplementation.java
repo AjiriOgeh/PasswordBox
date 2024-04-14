@@ -28,7 +28,7 @@ public class NoteServiceImplementation implements NoteService{
     }
 
     @Override
-    public Note editNote(EditNoteRequest editNoteRequest, Vault vault) {
+    public Note editNote(EditNoteRequest editNoteRequest, Vault vault) throws Exception {
         Note note = findNoteInVault(editNoteRequest.getTitle().toLowerCase(), vault);
         validateNoteTitle(editNoteRequest.getEditedTitle(), vault);
         Note updatedNote = editNoteRequestMap(editNoteRequest, note);
